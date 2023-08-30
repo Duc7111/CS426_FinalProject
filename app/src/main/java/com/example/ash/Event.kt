@@ -28,6 +28,8 @@ class Event (
     private val attendees: Vector<Attendee> = Vector<Attendee>()
 )
 {
+    constructor(event: Event) : this(event.summary, event.description, event.location, event.startTime, event.endTime, event.hasAnEnd, event.attendees)
+
     @Composable
     private fun ComposeTime(calendar: Calendar)
     {
@@ -48,6 +50,64 @@ class Event (
         }
     }
 
+    private fun isTimeConflict(event: Event): Boolean
+    {
+        val start1 = startTime.get(Calendar.HOUR_OF_DAY)*60 + startTime.get(Calendar.MINUTE)
+        val start2 = event.startTime.get(Calendar.HOUR_OF_DAY)*60 + event.startTime.get(Calendar.MINUTE)
+        val end1 = endTime.get(Calendar.HOUR_OF_DAY)*60 + endTime.get(Calendar.MINUTE)
+        val end2 = event.endTime.get(Calendar.HOUR_OF_DAY)*60 + event.endTime.get(Calendar.MINUTE)
+
+        if(hasAnEnd)
+        {
+            if(event.hasAnEnd && (start1 in start2 .. end2 || end1 in start2 .. end2)
+                || !event.hasAnEnd && end1 > start2)
+                return true
+        }
+        else if(!event.hasAnEnd || end2 > start1) return true
+        return false
+    }
+
+    @Override
+    operator fun compareTo(event: Event): Int
+    {
+        if(hasAnEnd)
+        {
+            if(event.hasAnEnd && (startTime in event.startTime..event.endTime || endTime in event.startTime..event.endTime)
+            || !event.hasAnEnd && endTime > event.startTime)
+                return 0
+        }
+        else if(!event.hasAnEnd || event.endTime > startTime) return 0
+        return startTime.compareTo(event.startTime)
+    }
+
+    fun isOnceYearConflict(event: Event): Boolean
+    {
+        val tempEvent = Event(event)
+        tempEvent.startTime.set(Calendar.YEAR, startTime.get(Calendar.YEAR))
+        tempEvent.endTime.set(Calendar.YEAR, endTime.get(Calendar.YEAR))
+        return this == tempEvent
+    }
+
+    fun isOnceMonthConflict(event: Event): Boolean
+    {
+        val tempEvent = Event(event)
+        tempEvent.startTime.set(Calendar.YEAR, startTime.get(Calendar.YEAR))
+        tempEvent.startTime.set(Calendar.MONTH, startTime.get(Calendar.MONTH))
+        tempEvent.endTime.set(Calendar.YEAR, endTime.get(Calendar.YEAR))
+        tempEvent.endTime.set(Calendar.MONTH, endTime.get(Calendar.MONTH))
+        return this == tempEvent
+    }
+
+    fun isOnceWeekConflict(event: Event): Boolean
+    {
+        if(startTime.get(Calendar.DAY_OF_WEEK) != event.startTime.get(Calendar.DAY_OF_WEEK)) return false
+        return isTimeConflict(event)
+    }
+
+    fun isOnceDayConflict(event: Event): Boolean
+    {
+        return isTimeConflict(event)
+    }
     fun getTime(SoE: Boolean): List<Int>
     {
         if(SoE) return listOf(startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE))
