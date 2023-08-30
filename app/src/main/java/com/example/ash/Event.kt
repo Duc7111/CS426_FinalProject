@@ -22,35 +22,57 @@ class Event (
     private val location: String = "",
 
     private val startTime: Calendar = Calendar.getInstance(),
-    private var endTime: Calendar? = null,
+    private val endTime: Calendar = Calendar.getInstance(),
+    private var hasAnEnd: Boolean = false,
 
     private val attendees: Vector<Attendee> = Vector<Attendee>()
 )
 {
     @Composable
-    private fun ComposeTime(calendar: Calendar?)
+    private fun ComposeTime(calendar: Calendar)
     {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .width(150.dp)
+                .width(150
+                    .dp)
         )
         {
-            if(calendar == null)
-            {
-                Text(text = "NA")
-            }
-            else
-            {
-                Text(
-                    text = calendarToDate(calendar),
-                )
-                Text(
-                    text = calendarToTime(calendar),
-                )
-            }
+            Text(
+                text = calendarToDate(calendar),
+            )
+            Text(
+                text = calendarToTime(calendar),
+            )
         }
+    }
+
+    fun getTime(SoE: Boolean): List<Int>
+    {
+        if(SoE) return listOf(startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE))
+        else if(hasAnEnd) listOf(endTime.get(Calendar.HOUR_OF_DAY), endTime.get(Calendar.MINUTE))
+        return emptyList()
+    }
+
+    fun getWeekDay(): Int
+    {
+        return startTime.get(Calendar.DAY_OF_WEEK)
+    }
+
+    fun getDate(): Int
+    {
+        return startTime.get(Calendar.DATE)
+    }
+
+    fun getMonth(): Int
+    {
+        return startTime.get(Calendar.MONTH)
+    }
+
+    fun getYear(): Int
+    {
+        return startTime.get(Calendar.YEAR)
     }
 
     @Composable
@@ -87,7 +109,10 @@ class Event (
                     Text(
                         text = "to"
                     )
-                    ComposeTime(calendar = endTime)
+                    if(hasAnEnd) ComposeTime(calendar = endTime)
+                    else Text(
+                        text = "NA"
+                    )
                 }
             }
             items(attendees)
