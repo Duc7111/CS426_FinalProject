@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import java.time.temporal.WeekFields
 import java.util.Vector
 
 class Event (
@@ -23,8 +22,7 @@ class Event (
     private val location: String = "",
 
     private val startTime: Calendar = Calendar.getInstance(),
-    private val endTime: Calendar = Calendar.getInstance(),
-    private val hasAnEnd: Boolean = false,
+    private val endTime: Calendar? = null,
     private val frequency: Int = 1,
 
     private val attendees: Vector<Attendee> = Vector<Attendee>()
@@ -54,17 +52,18 @@ class Event (
     {
         val start1 = startTime.get(Calendar.HOUR_OF_DAY)*60 + startTime.get(Calendar.MINUTE)
         val start2 = event.startTime.get(Calendar.HOUR_OF_DAY)*60 + event.startTime.get(Calendar.MINUTE)
-        val end1 = endTime.get(Calendar.HOUR_OF_DAY)*60 + endTime.get(Calendar.MINUTE)
-        val end2 = event.endTime.get(Calendar.HOUR_OF_DAY)*60 + event.endTime.get(Calendar.MINUTE)
 
-        if(hasAnEnd)
-        {
-            if(event.hasAnEnd && (start1 in start2 .. end2 || end1 in start2 .. end2)
-                || !event.hasAnEnd && end1 > start2)
-                return true
-        }
-        else if(!event.hasAnEnd || end2 > start1) return true
-        return false
+        return if(endTime != null) {
+            val end1 = endTime.get(Calendar.HOUR_OF_DAY)*60 + endTime.get(Calendar.MINUTE)
+            if(event.endTime != null) {
+                val end2 = event.endTime.get(Calendar.HOUR_OF_DAY)*60 + event.endTime.get(Calendar.MINUTE)
+                start1 in start2 .. end2 || end1 in start2 .. end2
+            } else end1 > start2
+        } else
+            if(event.endTime != null) {
+                val end2 = event.endTime.get(Calendar.HOUR_OF_DAY)*60 + event.endTime.get(Calendar.MINUTE)
+                end2 > start1
+            } else false
     }
 
     companion object Frequency {
@@ -107,7 +106,7 @@ class Event (
     fun getTime(SoE: Boolean): List<Int>
     {
         if(SoE) return listOf(startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE))
-        else if(hasAnEnd) listOf(endTime.get(Calendar.HOUR_OF_DAY), endTime.get(Calendar.MINUTE))
+        else if(endTime != null) listOf(endTime.get(Calendar.HOUR_OF_DAY), endTime.get(Calendar.MINUTE))
         return emptyList()
     }
 
@@ -170,7 +169,7 @@ class Event (
                     Text(
                         text = "to"
                     )
-                    if(hasAnEnd) ComposeTime(calendar = endTime)
+                    if(endTime != null) ComposeTime(calendar = endTime)
                     else Text(
                         text = "NA"
                     )
