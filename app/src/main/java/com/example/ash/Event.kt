@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import java.time.temporal.WeekFields
 import java.util.Vector
 
 class Event (
@@ -23,13 +24,12 @@ class Event (
 
     private val startTime: Calendar = Calendar.getInstance(),
     private val endTime: Calendar = Calendar.getInstance(),
-    private var hasAnEnd: Boolean = false,
+    private val hasAnEnd: Boolean = false,
+    private val frequency: Int = 1,
 
     private val attendees: Vector<Attendee> = Vector<Attendee>()
 )
 {
-    constructor(event: Event) : this(event.summary, event.description, event.location, event.startTime, event.endTime, event.hasAnEnd, event.attendees)
-
     @Composable
     private fun ComposeTime(calendar: Calendar)
     {
@@ -67,22 +67,18 @@ class Event (
         return false
     }
 
-    @Override
-    operator fun compareTo(event: Event): Int
-    {
-        if(hasAnEnd)
-        {
-            if(event.hasAnEnd && (startTime in event.startTime..event.endTime || endTime in event.startTime..event.endTime)
-            || !event.hasAnEnd && endTime > event.startTime)
-                return 0
-        }
-        else if(!event.hasAnEnd || event.endTime > startTime) return 0
-        return startTime.compareTo(event.startTime)
+    companion object Frequency {
+        const val once = 1
+        const val yearly = 2
+        const val monthly = 3
+        const val weekly = 4
+        const val daily = 5
     }
 
     fun isOnceOnceConflict(event: Event): Boolean
     {
-        return this == event
+        if(getYear() != event.getYear() || getDate() != event.getDate() || getMonth() != event.getMonth()) return false
+        return isTimeConflict(event)
     }
 
     fun isYearConflict(event: Event): Boolean
@@ -133,6 +129,11 @@ class Event (
     fun getYear(): Int
     {
         return startTime.get(Calendar.YEAR)
+    }
+
+    fun getFrequency(): Int
+    {
+        return frequency
     }
 
     @Composable
