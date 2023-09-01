@@ -80,34 +80,34 @@ class Event (
         return startTime.compareTo(event.startTime)
     }
 
-    fun isOnceYearConflict(event: Event): Boolean
+    fun isOnceOnceConflict(event: Event): Boolean
     {
-        val tempEvent = Event(event)
-        tempEvent.startTime.set(Calendar.YEAR, startTime.get(Calendar.YEAR))
-        tempEvent.endTime.set(Calendar.YEAR, endTime.get(Calendar.YEAR))
-        return this == tempEvent
+        return this == event
     }
 
-    fun isOnceMonthConflict(event: Event): Boolean
+    fun isYearConflict(event: Event): Boolean
     {
-        val tempEvent = Event(event)
-        tempEvent.startTime.set(Calendar.YEAR, startTime.get(Calendar.YEAR))
-        tempEvent.startTime.set(Calendar.MONTH, startTime.get(Calendar.MONTH))
-        tempEvent.endTime.set(Calendar.YEAR, endTime.get(Calendar.YEAR))
-        tempEvent.endTime.set(Calendar.MONTH, endTime.get(Calendar.MONTH))
-        return this == tempEvent
-    }
-
-    fun isOnceWeekConflict(event: Event): Boolean
-    {
-        if(startTime.get(Calendar.DAY_OF_WEEK) != event.startTime.get(Calendar.DAY_OF_WEEK)) return false
+        if(getDate() != event.getDate() || getMonth() != event.getMonth()) return false
         return isTimeConflict(event)
     }
 
-    fun isOnceDayConflict(event: Event): Boolean
+    fun isMonthConflict(event: Event): Boolean
+    {
+        if(getDate() != event.getDate()) return false
+        return isTimeConflict(event)
+    }
+
+    fun isWeekConflict(event: Event): Boolean
+    {
+        if(getWeekDay() != event.getWeekDay()) return false
+        return isTimeConflict(event)
+    }
+
+    fun isDayConflict(event: Event): Boolean
     {
         return isTimeConflict(event)
     }
+
     fun getTime(SoE: Boolean): List<Int>
     {
         if(SoE) return listOf(startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE))
