@@ -14,16 +14,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.Vector
 
 class Event (
+    private val frequency: Frequency = Frequency.ONCE,
+
     private val summary: String = "",
     private val description: String = "",
     private val location: String = "",
 
     private val startTime: Calendar = Calendar.getInstance(),
     private val endTime: Calendar? = null,
-    private val frequency: Int = 1,
 
     private val attendees: Vector<Attendee> = Vector<Attendee>()
 )
@@ -65,13 +68,58 @@ class Event (
                 end2 > start1
             } else false
     }
+    enum class Frequency{
+        ONCE, YEARLY, MONTHLY, WEEKLY, DAILY
+    }
 
-    companion object Frequency {
-        const val once = 1
-        const val yearly = 2
-        const val monthly = 3
-        const val weekly = 4
-        const val daily = 5
+    companion object
+    {
+        fun read(fin: FileInputStream): Event
+        {
+            val frequency = DataHandler.readFrequency(fin)
+            val summary =  DataHandler.readString(fin)
+            val description = DataHandler.readString(fin)
+            val location = DataHandler.readString(fin)
+            val startTime = DataHandler.readCalendar(fin)
+            val year = DataHandler.readString(fin)
+            val endTime: Calendar? = if(year == "NA") null else {
+                val month = DataHandler.readInt(fin)
+                val date = DataHandler.readInt(fin)
+                val hour = DataHandler.readInt(fin)
+                val minute = DataHandler.readInt(fin)
+                val calendar = Calendar.getInstance()
+
+                calendar.set(Calendar.YEAR, year.toInt())
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DATE, date)
+                calendar.set(Calendar.HOUR_OF_DAY, hour)
+                calendar.set(Calendar.MINUTE, minute)
+                calendar
+            }
+            val size = DataHandler.readInt(fin)
+            val attendees = Vector<Attendee>(size)
+            for(i in 0 until size)
+            {
+                attendees[i] = Attendee.read(fin)
+            }
+            return Event(frequency, summary, description, location, startTime, endTime, attendees)
+        }
+    }
+
+    fun write(fout: FileOutputStream)
+    {
+        DataHandler.write(frequency, fout)
+        DataHandler.write(summary, fout)
+        DataHandler.write(description, fout)
+        DataHandler.write(location, fout)
+        DataHandler.write(startTime, fout)
+        if(endTime == null) DataHandler.write("NA", fout)
+        else DataHandler.write(endTime, fout)
+        DataHandler.write(attendees.size, fout)
+        for(attendee in attendees)
+        {
+            attendee.write(fout)
+        }
     }
 
     fun isOnceOnceConflict(event: Event): Boolean
@@ -130,7 +178,7 @@ class Event (
         return startTime.get(Calendar.YEAR)
     }
 
-    fun getFrequency(): Int
+    fun getFrequency(): Frequency
     {
         return frequency
     }
