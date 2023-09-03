@@ -1,11 +1,27 @@
 package com.example.ash
 
 import android.icu.util.Calendar
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.util.Vector
 
 class DataHandler {
     companion object{
+
+        private fun dtToCalendar(dt: String): Calendar
+        {
+            val calendar = Calendar.getInstance()
+
+
+            return calendar
+        }
+
+        private fun stringToAttendee(string: String): Attendee
+        {
+            return Attendee()
+        }
+
         fun write(int: Int, fout: FileOutputStream)
         {
             val data = (int.toString() + '\n' ).toByteArray()
@@ -73,6 +89,31 @@ class DataHandler {
                 "daily" -> Event.Frequency.DAILY
                 else -> Event.Frequency.ONCE
             }
+        }
+
+        fun icsToEvent(file: File): Event
+        {
+            if(!file.isFile) return Event()
+            var summary: String = ""
+            var description: String = ""
+            var location: String = ""
+            var startTime: Calendar = Calendar.getInstance()
+            var endTime: Calendar? = null
+            var attendees: Vector<Attendee> = Vector<Attendee>()
+            val fin = file.inputStream()
+            fin.bufferedReader().lineSequence().forEach{
+                val data = it.substringAfter(':')
+                when(it.substringBefore(':'))
+                {
+                    "SUMMARY" -> summary = data
+                    "DESCRIPTION" -> description = data
+                    "LOCATION" -> location = data
+                    "DTSTART" -> startTime = dtToCalendar(data)
+                    "DTEND" -> endTime = dtToCalendar(data)
+                    "ATTENDEE" -> attendees.addElement(stringToAttendee(data))
+                }
+            }
+            return Event(Event.Frequency.ONCE, summary, description, location, startTime, endTime, attendees)
         }
     }
 }

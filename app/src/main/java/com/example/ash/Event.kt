@@ -183,6 +183,24 @@ class Event (
         return frequency
     }
 
+    fun getSummary() = summary
+    fun getDescription() = description
+    fun getLocation() = location
+    fun getAttendees(): List<Attendee>
+    {
+        return attendees.toList()
+    }
+
+    fun addAttendee(attendee: Attendee)
+    {
+        attendees.addElement(attendee)
+    }
+
+    fun removeAttendee(attendee: Attendee): Boolean
+    {
+        return attendees.remove(attendee)
+    }
+
     @Composable
     fun ComposeEvent()
     {

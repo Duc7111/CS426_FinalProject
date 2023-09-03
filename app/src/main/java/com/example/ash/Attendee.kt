@@ -33,30 +33,7 @@ class Attendee (
         }
     }
 
-    @Composable
-    fun ComposeAttendee()
-    {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        )
-        {
-            Text(
-                text = "$name ($role)"
-            )
-            Text(
-                text = contact
-            )
-        }
-    }
-
-
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ComposeAttendee()
-{
-    val attendee = Attendee()
-    attendee.ComposeAttendee()
+    fun getName() = name
+    fun getRole() = role
+    fun getContact() = contact
 }
