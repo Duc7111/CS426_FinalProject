@@ -243,7 +243,7 @@ class Event (
             }
             items(attendees)
             {
-                it.ComposeAttendee()
+                //it.ComposeAttendee()
             }
         }
     }
