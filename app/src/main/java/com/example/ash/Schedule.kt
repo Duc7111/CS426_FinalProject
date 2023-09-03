@@ -1,11 +1,12 @@
 package com.example.ash
 
 import android.icu.util.Calendar
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.Vector
 
-class Schedule(
+class Schedule private constructor(
     private val events: Vector<Event> = Vector<Event>(),
     private val yearlyEvents:Vector<Event> = Vector<Event>(),
     private val monthlyEvents:Vector<Event> = Vector<Event>(),
@@ -74,8 +75,19 @@ class Schedule(
     }
 
     companion object{
-        fun read(fin: FileInputStream)
+
+        @Volatile
+        private var instance: Schedule? = null
+
+        fun getInstance(file: File?) =
+            instance ?: synchronized(this){
+                instance ?: (if(file == null) Schedule() else read(file)).also{instance = it}
+            }
+
+        private fun read(file: File): Schedule
         {
+            if(!file.isFile) return Schedule()
+            val fin = file.inputStream()
             var size = DataHandler.readInt(fin)
             val events = Vector<Event>(size)
             for(i in 0 until size) events[i] = Event.read(fin)
@@ -95,6 +107,8 @@ class Schedule(
             size = DataHandler.readInt(fin)
             val dailyEvents = Vector<Event>(size)
             for(i in 0 until size) dailyEvents[i] = Event.read(fin)
+
+            return Schedule(events, yearlyEvents, monthlyEvents, weeklyEvents, dailyEvents)
         }
     }
 
