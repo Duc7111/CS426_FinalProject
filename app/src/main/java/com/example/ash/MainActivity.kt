@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ash.ui.theme.ASHTheme
 import com.example.ash.ui.theme.DeepBlue
+import com.example.ash.ui.theme.MediumBlue
 import com.example.ash.ui.theme.TextWhite
 
 
@@ -40,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    Homescreen(name = "Phoenix")
                 }
             }
         }
@@ -82,29 +85,104 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
     Box(modifier = Modifier
         .background(DeepBlue)
         .fillMaxSize()
+        .padding(20.dp)
     ){
-
-        Column(modifier = modifier) {
-            Greeting(name)
-            Text(
-                text = "One time events",
-                color = TextWhite,
-                //style = MaterialTheme.typography.body1
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-            )
-            Box (modifier = Modifier
-                .size(width = 350.dp, height = 100.dp)
-                .background(Color.Blue), // Set the background color
+        LazyColumn(modifier = modifier) {
+            item{
+                Greeting(name)
+            }
+            item {
+                Text(
+                    text = "One time events",
+                    color = TextWhite,
+                    //style = MaterialTheme.typography.body1
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                )
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(MediumBlue), // Set the background color
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                }
+            }
+            item {
+                Text(
+                    text = "Daily events",
+                    color = TextWhite,
+                    //style = MaterialTheme.typography.body1
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                )
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(MediumBlue), // Set the background color
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                }
+            }
+            item {
+                Text(
+                    text = "Weekly events",
+                    color = TextWhite,
+                    //style = MaterialTheme.typography.body1
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                )
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(MediumBlue), // Set the background color
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                }
+            }
+            item {
+                Text(
+                    text = "Monthly events",
+                    color = TextWhite,
+                    //style = MaterialTheme.typography.body1
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                )
+            }
+            item{Box (modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(MediumBlue), // Set the background color
                 contentAlignment = androidx.compose.ui.Alignment.Center){
             }
-            Text(
-                text = "Daily events",
-                color = TextWhite,
-                //style = MaterialTheme.typography.body1
-                modifier = Modifier
-                    .padding(vertical = 16.dp)
-            )
+            }
+            item {
+                Text(
+                    text = "Yearly events",
+                    color = TextWhite,
+                    //style = MaterialTheme.typography.body1
+                    modifier = Modifier
+                        .padding(vertical = 16.dp)
+                )
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(MediumBlue), // Set the background color
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                }
+            }
         }
     }
 
