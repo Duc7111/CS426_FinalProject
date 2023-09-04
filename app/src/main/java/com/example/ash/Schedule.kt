@@ -79,9 +79,9 @@ class Schedule private constructor(
         @Volatile
         private var instance: Schedule? = null
 
-        fun getInstance(file: File?) =
+        fun getInstance(file: File? = null) =
             instance ?: synchronized(this){
-                instance ?: (if(file == null) Schedule() else read(file)).also{instance = it}
+                instance ?: (if(file == null || !file.isFile) Schedule() else read(file)).also{instance = it}
             }
 
         private fun read(file: File): Schedule
@@ -165,7 +165,7 @@ class Schedule private constructor(
     }
 
 
-    fun getDaySchedule(calendar: Calendar): Vector<Event>
+    fun getDaySchedule(calendar: Calendar): List<Event>
     {
         val schedule = Vector(dailyEvents)
 
@@ -178,6 +178,6 @@ class Schedule private constructor(
         for(e in events)
             if(e.getDate() == calendar.get(Calendar.DATE) && e.getMonth() == calendar.get(Calendar.MONTH) && e.getYear() == calendar.get(Calendar.YEAR) ) schedule.addElement(e)
 
-        return schedule
+        return schedule.toList()
     }
 }

@@ -72,6 +72,60 @@ class Event (
             }
             return Event(frequency, summary, description, location, startTime, endTime, attendees)
         }
+
+        fun calendarToDate(calendar: Calendar): String
+        {
+            val date = calendar.get(Calendar.DATE)
+            val month = when(calendar.get(Calendar.MONTH))
+            {
+                Calendar.JANUARY -> "January"
+                Calendar.FEBRUARY -> "February"
+                Calendar.MARCH -> "March"
+                Calendar.APRIL -> "April"
+                Calendar.MAY -> "May"
+                Calendar.JUNE -> "June"
+                Calendar.JULY -> "July"
+                Calendar.AUGUST -> "August"
+                Calendar.SEPTEMBER -> "September"
+                Calendar.OCTOBER -> "October"
+                Calendar.NOVEMBER -> "November"
+                Calendar.DECEMBER -> "December"
+                else -> ""
+            }
+            val year = calendar.get(Calendar.YEAR)
+            return "$month $date, $year"
+        }
+
+        fun intToMonth(int: Int) =
+            when(int)
+            {
+                Calendar.JANUARY -> "January"
+                Calendar.FEBRUARY -> "February"
+                Calendar.MARCH -> "March"
+                Calendar.APRIL -> "April"
+                Calendar.MAY -> "May"
+                Calendar.JUNE -> "June"
+                Calendar.JULY -> "July"
+                Calendar.AUGUST -> "August"
+                Calendar.SEPTEMBER -> "September"
+                Calendar.OCTOBER -> "October"
+                Calendar.NOVEMBER -> "November"
+                Calendar.DECEMBER -> "December"
+                else -> "It not a month"
+            }
+
+        fun intToWeekDay(int: Int) =
+            when(int)
+            {
+                Calendar.MONDAY -> "Monday"
+                Calendar.TUESDAY -> "Tuesday"
+                Calendar.WEDNESDAY -> "Wednesday"
+                Calendar.THURSDAY -> "Thursday"
+                Calendar.FRIDAY -> "Friday"
+                Calendar.SATURDAY -> "Saturday"
+                Calendar.SUNDAY -> "Sunday"
+                else -> "It not a day of week"
+            }
     }
 
     fun write(fout: FileOutputStream)
@@ -154,11 +208,11 @@ class Event (
     fun getSummary() = summary
     fun getDescription() = description
     fun getLocation() = location
-    fun getStartTime() = startTime
     fun getAttendees(): List<Attendee>
     {
         return attendees.toList()
     }
+    fun getStartTime() = startTime
 
     fun addAttendee(attendee: Attendee)
     {
@@ -168,29 +222,6 @@ class Event (
     {
         return attendees.remove(attendee)
     }
-}
-
-private fun calendarToDate(calendar: Calendar): String
-{
-    val date = calendar.get(Calendar.DATE)
-    val month = when(calendar.get(Calendar.MONTH))
-    {
-        Calendar.JANUARY -> "January"
-        Calendar.FEBRUARY -> "February"
-        Calendar.MARCH -> "March"
-        Calendar.APRIL -> "April"
-        Calendar.MAY -> "May"
-        Calendar.JUNE -> "June"
-        Calendar.JULY -> "July"
-        Calendar.AUGUST -> "August"
-        Calendar.SEPTEMBER -> "September"
-        Calendar.OCTOBER -> "October"
-        Calendar.NOVEMBER -> "November"
-        Calendar.DECEMBER -> "December"
-        else -> ""
-    }
-    val year = calendar.get(Calendar.YEAR)
-    return "$month $date, $year"
 }
 
 private fun calendarToTime(calendar: Calendar): List<Int>
