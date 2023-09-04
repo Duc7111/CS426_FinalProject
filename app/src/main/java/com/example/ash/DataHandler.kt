@@ -13,7 +13,6 @@ class DataHandler {
         {
             val calendar = Calendar.getInstance()
 
-
             return calendar
         }
 
@@ -99,7 +98,7 @@ class DataHandler {
             var location: String = ""
             var startTime: Calendar = Calendar.getInstance()
             var endTime: Calendar? = null
-            var attendees: Vector<Attendee> = Vector<Attendee>()
+            val attendees: Vector<Attendee> = Vector<Attendee>()
             val fin = file.inputStream()
             fin.bufferedReader().lineSequence().forEach{
                 val data = it.substringAfter(':')
