@@ -1,6 +1,7 @@
 package com.example.ash
 
 import android.icu.util.Calendar
+import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -23,12 +24,12 @@ class DataHandler {
 
         fun write(int: Int, fout: FileOutputStream)
         {
-            val data = (int.toString() + '\n' ).toByteArray()
+            val data = (int.toString() + "\n" ).toByteArray()
             fout.write(data)
         }
         fun write(string: String, fout:FileOutputStream)
         {
-            val data = (string + '\n').toByteArray()
+            val data = (string + "\n").toByteArray()
             fout.write(data)
         }
         fun write(calendar: Calendar, fout: FileOutputStream)
@@ -52,21 +53,20 @@ class DataHandler {
             fout.write(data)
         }
 
-        fun readInt(fin: FileInputStream): Int
+        fun readInt(fbr: BufferedReader): Int
         {
-            val data = fin.bufferedReader().readLine()
-            return data.toInt()
+            return fbr.readLine().toInt()
         }
-        fun readString(fin: FileInputStream): String {
-            return fin.bufferedReader().readLine()
+        fun readString(fbr: BufferedReader): String {
+            return fbr.readLine()
         }
-        fun readCalendar(fin: FileInputStream): Calendar
+        fun readCalendar(fbr: BufferedReader): Calendar
         {
-            val year = readInt(fin)
-            val month = readInt(fin)
-            val date = readInt(fin)
-            val hour = readInt(fin)
-            val minute = readInt(fin)
+            val year = readInt(fbr)
+            val month = readInt(fbr)
+            val date = readInt(fbr)
+            val hour = readInt(fbr)
+            val minute = readInt(fbr)
             val calendar = Calendar.getInstance()
 
             calendar.set(Calendar.YEAR, year)
@@ -77,9 +77,9 @@ class DataHandler {
 
             return calendar
         }
-        fun readFrequency(fin: FileInputStream): Event.Frequency
+        fun readFrequency(fbr: BufferedReader): Event.Frequency
         {
-            return when(readString(fin))
+            return when(readString(fbr))
             {
                 "once" -> Event.Frequency.ONCE
                 "yearly" -> Event.Frequency.YEARLY
@@ -93,9 +93,9 @@ class DataHandler {
         fun icsToEvent(file: File): Event
         {
             if(!file.isFile) return Event()
-            var summary: String = ""
-            var description: String = ""
-            var location: String = ""
+            var summary = ""
+            var description = ""
+            var location = ""
             var startTime: Calendar = Calendar.getInstance()
             var endTime: Calendar? = null
             val attendees: Vector<Attendee> = Vector<Attendee>()

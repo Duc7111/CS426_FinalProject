@@ -88,26 +88,28 @@ class Schedule private constructor(
         {
             if(!file.isFile) return Schedule()
             val fin = file.inputStream()
-            var size = DataHandler.readInt(fin)
+            val fbr = fin.bufferedReader()
+            var size = DataHandler.readInt(fbr)
             val events = Vector<Event>(size)
-            for(i in 0 until size) events[i] = Event.read(fin)
+            for(i in 0 until size) events.addElement(Event.read(fbr))
 
-            size = DataHandler.readInt(fin)
+            size = DataHandler.readInt(fbr)
             val yearlyEvents = Vector<Event>(size)
-            for(i in 0 until size) yearlyEvents[i] = Event.read(fin)
+            for(i in 0 until size) yearlyEvents.addElement(Event.read(fbr))
 
-            size = DataHandler.readInt(fin)
+            size = DataHandler.readInt(fbr)
             val monthlyEvents = Vector<Event>(size)
-            for(i in 0 until size) monthlyEvents[i] = Event.read(fin)
+            for(i in 0 until size) monthlyEvents.addElement(Event.read(fbr))
 
-            size = DataHandler.readInt(fin)
+            size = DataHandler.readInt(fbr)
             val weeklyEvents = Vector<Event>(size)
-            for(i in 0 until size) weeklyEvents[i] = Event.read(fin)
+            for(i in 0 until size) weeklyEvents.addElement(Event.read(fbr))
 
-            size = DataHandler.readInt(fin)
+            size = DataHandler.readInt(fbr)
             val dailyEvents = Vector<Event>(size)
-            for(i in 0 until size) dailyEvents[i] = Event.read(fin)
+            for(i in 0 until size) dailyEvents.addElement(Event.read(fbr))
 
+            fin.close()
             return Schedule(events, yearlyEvents, monthlyEvents, weeklyEvents, dailyEvents)
         }
     }

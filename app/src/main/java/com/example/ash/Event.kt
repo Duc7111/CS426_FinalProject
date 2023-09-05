@@ -1,6 +1,7 @@
 package com.example.ash
 
 import android.icu.util.Calendar
+import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.Vector
@@ -42,19 +43,19 @@ class Event (
 
     companion object
     {
-        fun read(fin: FileInputStream): Event
+        fun read(fbr: BufferedReader): Event
         {
-            val frequency = DataHandler.readFrequency(fin)
-            val summary =  DataHandler.readString(fin)
-            val description = DataHandler.readString(fin)
-            val location = DataHandler.readString(fin)
-            val startTime = DataHandler.readCalendar(fin)
-            val year = DataHandler.readString(fin)
+            val frequency = DataHandler.readFrequency(fbr)
+            val summary =  DataHandler.readString(fbr)
+            val description = DataHandler.readString(fbr)
+            val location = DataHandler.readString(fbr)
+            val startTime = DataHandler.readCalendar(fbr)
+            val year = DataHandler.readString(fbr)
             val endTime: Calendar? = if(year == "NA") null else {
-                val month = DataHandler.readInt(fin)
-                val date = DataHandler.readInt(fin)
-                val hour = DataHandler.readInt(fin)
-                val minute = DataHandler.readInt(fin)
+                val month = DataHandler.readInt(fbr)
+                val date = DataHandler.readInt(fbr)
+                val hour = DataHandler.readInt(fbr)
+                val minute = DataHandler.readInt(fbr)
                 val calendar = Calendar.getInstance()
 
                 calendar.set(Calendar.YEAR, year.toInt())
@@ -64,11 +65,11 @@ class Event (
                 calendar.set(Calendar.MINUTE, minute)
                 calendar
             }
-            val size = DataHandler.readInt(fin)
+            val size = DataHandler.readInt(fbr)
             val attendees = Vector<Attendee>(size)
             for(i in 0 until size)
             {
-                attendees[i] = Attendee.read(fin)
+                attendees.addElement(Attendee.read(fbr))
             }
             return Event(frequency, summary, description, location, startTime, endTime, attendees)
         }
@@ -208,12 +209,12 @@ class Event (
     fun getSummary() = summary
     fun getDescription() = description
     fun getLocation() = location
+    fun getStartTime() = startTime
+
     fun getAttendees(): List<Attendee>
     {
         return attendees.toList()
     }
-    fun getStartTime() = startTime
-
     fun addAttendee(attendee: Attendee)
     {
         attendees.addElement(attendee)

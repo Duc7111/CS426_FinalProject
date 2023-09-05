@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
+import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
@@ -24,11 +25,11 @@ class Attendee (
 
     companion object
     {
-        fun read(fin: FileInputStream): Attendee
+        fun read(fbr: BufferedReader): Attendee
         {
-            val name = DataHandler.readString(fin)
-            val role = DataHandler.readString(fin)
-            val contact = DataHandler.readString(fin)
+            val name = DataHandler.readString(fbr)
+            val role = DataHandler.readString(fbr)
+            val contact = DataHandler.readString(fbr)
             return Attendee(name, role, contact)
         }
     }
