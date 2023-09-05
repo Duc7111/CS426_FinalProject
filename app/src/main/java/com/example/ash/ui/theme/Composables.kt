@@ -34,7 +34,7 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp),
-        shape = RoundedCornerShape(5.dp),
+        shape = RoundedCornerShape(8.dp),
 
     ) {
         Text(

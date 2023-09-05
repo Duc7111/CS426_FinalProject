@@ -114,9 +114,9 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                                 color = MediumBlue,
                                 shape = RoundedCornerShape(16.dp)
                             ), // Set the background color
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.TopStart
                     ) {
-                        LazyColumn(modifier = modifier) {
+                        LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             item {
                                 EventButton(modifier = modifier)
                             }
