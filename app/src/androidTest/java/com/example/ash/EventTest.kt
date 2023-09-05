@@ -57,6 +57,6 @@ class EventTest {
 
     @Test
     fun removeAttendee() {
-        assert(event.removeAttendee(Attendee("attendee 4", "role 4", "contact 4")))
+        assert(event.removeAttendee(Attendee("attendee 3", "role 3", "contact 3")))
     }
 }

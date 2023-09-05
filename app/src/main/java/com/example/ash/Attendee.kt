@@ -16,6 +16,12 @@ class Attendee (
     private val contact: String = "",
 )
 {
+    override fun equals(other: Any?): Boolean
+    {
+        return if(other is Attendee)
+            name == other.name && role == other.role && contact == other.contact
+        else false
+    }
     fun write(fout: FileOutputStream)
     {
         DataHandler.write(name, fout)

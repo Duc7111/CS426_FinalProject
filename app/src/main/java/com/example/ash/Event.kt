@@ -20,6 +20,13 @@ class Event (
 )
 {
 
+    override fun equals(other: Any?): Boolean
+    {
+        return if(other is Event)
+            frequency == other.frequency && summary == other.summary && description == other.description && location == other.location && startTime == other.startTime && endTime == other.endTime && attendees == other.attendees
+        else false
+    }
+
     private fun isTimeConflict(event: Event): Boolean
     {
         val start1 = startTime.get(Calendar.HOUR_OF_DAY)*60 + startTime.get(Calendar.MINUTE)
