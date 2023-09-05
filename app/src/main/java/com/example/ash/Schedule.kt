@@ -166,6 +166,11 @@ class Schedule private constructor(
         return null
     }
 
+    fun getOnceEvents() = events.toList()
+    fun getYearlyEvents() = yearlyEvents.toList()
+    fun getMonthlyEvents() = monthlyEvents.toList()
+    fun getWeeklyEvents() = weeklyEvents.toList()
+    fun getDailyEvents() = dailyEvents.toList()
 
     fun getDaySchedule(calendar: Calendar): List<Event>
     {
