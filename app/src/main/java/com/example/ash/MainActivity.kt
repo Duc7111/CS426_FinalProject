@@ -34,6 +34,8 @@ import com.example.ash.ui.theme.MediumBlue
 import com.example.ash.ui.theme.TextWhite
 import com.example.ash.ui.theme.Greeting
 import com.example.ash.ui.theme.EventButton
+import com.example.ash.ui.theme.OptionButtons
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -212,6 +214,7 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                     }
                 }
             }
+            OptionButtons()
         }
     }
 }
