@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,9 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ash.ui.theme.ASHTheme
 import com.example.ash.ui.theme.DeepBlue
+import com.example.ash.ui.theme.EventButton
 import com.example.ash.ui.theme.MediumBlue
 import com.example.ash.ui.theme.TextWhite
-
+import com.example.ash.ui.theme.Greeting
+import com.example.ash.ui.theme.EventButton
+import com.example.ash.ui.theme.OptionButtons
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,132 +90,133 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
         .background(DeepBlue)
         .fillMaxSize()
         .padding(20.dp)
-    ){
-        LazyColumn(modifier = modifier) {
-            item{
-                Greeting(name)
-            }
-            item {
-                Text(
-                    text = "One time events",
-                    color = TextWhite,
-                    //style = MaterialTheme.typography.body1
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                )
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .background(MediumBlue), // Set the background color
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(top = 10.dp) // Add padding to separate Greeting from LazyColumn
+        ) {
+            Greeting(name)
+            LazyColumn(modifier = modifier) {
+                item {
+                    Text(
+                        text = "One time events",
+                        color = TextWhite,
+                        //style = MaterialTheme.typography.body1
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                    )
+                }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(
+                                color = MediumBlue,
+                                shape = RoundedCornerShape(16.dp)
+                            ), // Set the background color
+                        contentAlignment = Alignment.TopStart
+                    ) {
+                        LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
+                            item {
+                                EventButton(modifier = modifier)
+                            }
+                        }
+                    }
+                }
+                item {
+                    Text(
+                        text = "Daily events",
+                        color = TextWhite,
+                        //style = MaterialTheme.typography.body1
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                    )
+                }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(
+                                color = MediumBlue,
+                                shape = RoundedCornerShape(16.dp)
+                            ), // Set the background color
+                        contentAlignment = Alignment.Center
+                    ) {
+                    }
+                }
+                item {
+                    Text(
+                        text = "Weekly events",
+                        color = TextWhite,
+                        //style = MaterialTheme.typography.body1
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                    )
+                }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(
+                                color = MediumBlue,
+                                shape = RoundedCornerShape(16.dp)
+                            ), // Set the background color
+                        contentAlignment = Alignment.Center
+                    ) {
+                    }
+                }
+                item {
+                    Text(
+                        text = "Monthly events",
+                        color = TextWhite,
+                        //style = MaterialTheme.typography.body1
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                    )
+                }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(
+                                color = MediumBlue,
+                                shape = RoundedCornerShape(16.dp)
+                            ), // Set the background color
+                        contentAlignment = Alignment.Center
+                    ) {
+                    }
+                }
+                item {
+                    Text(
+                        text = "Yearly events",
+                        color = TextWhite,
+                        //style = MaterialTheme.typography.body1
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                    )
+                }
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .background(
+                                color = MediumBlue,
+                                shape = RoundedCornerShape(16.dp)
+                            ), // Set the background color
+                        contentAlignment = Alignment.Center
+                    ) {
+                    }
                 }
             }
-            item {
-                Text(
-                    text = "Daily events",
-                    color = TextWhite,
-                    //style = MaterialTheme.typography.body1
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                )
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .background(MediumBlue), // Set the background color
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                }
-            }
-            item {
-                Text(
-                    text = "Weekly events",
-                    color = TextWhite,
-                    //style = MaterialTheme.typography.body1
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                )
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .background(MediumBlue), // Set the background color
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                }
-            }
-            item {
-                Text(
-                    text = "Monthly events",
-                    color = TextWhite,
-                    //style = MaterialTheme.typography.body1
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                )
-            }
-            item{Box (modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .background(MediumBlue), // Set the background color
-                contentAlignment = androidx.compose.ui.Alignment.Center){
-            }
-            }
-            item {
-                Text(
-                    text = "Yearly events",
-                    color = TextWhite,
-                    //style = MaterialTheme.typography.body1
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                )
-            }
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .background(MediumBlue), // Set the background color
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                }
-            }
+            OptionButtons()
         }
     }
-
-}
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Good morning, $name",
-                    color = TextWhite,
-                    //style = MaterialTheme.typography.h2
-                )
-                Text(
-                    text = "Let's check your schedule !",
-                    color = TextWhite,
-                    //style = MaterialTheme.typography.body1
-                )
-
-            }
-        }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
