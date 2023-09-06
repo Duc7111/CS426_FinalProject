@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -46,7 +48,6 @@ import com.example.ash.ui.theme.Greeting
 import com.example.ash.ui.theme.EventButton
 import com.example.ash.ui.theme.OptionButtons
 import com.example.ash.ui.theme.FloatingWindowContent
-//import com.jgabrielfreitas.
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,8 +100,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Homescreen(name: String, modifier: Modifier = Modifier) {
 
-    //var isFloatingWindowVisible by remember { mutableStateOf(false) }
-
     Box(modifier = Modifier
         .background(DeepBlue)
         .fillMaxSize()
@@ -135,9 +134,7 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             item {
-//                                EventButton(modifier = modifier) {
-//                                    isFloatingWindowVisible = true
-//                                }
+                                EventButton(modifier = modifier)
                             }
                         }
                     }
@@ -243,8 +240,6 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
         }
     }
     OptionButtons()
-
-
 
 }
 
