@@ -1,6 +1,9 @@
 package com.example.ash
 
+import android.content.Context
 import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -15,14 +18,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +47,7 @@ import com.example.ash.ui.theme.TextWhite
 import com.example.ash.ui.theme.Greeting
 import com.example.ash.ui.theme.EventButton
 import com.example.ash.ui.theme.OptionButtons
+import com.example.ash.ui.theme.FloatingWindowContent
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,10 +99,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Homescreen(name: String, modifier: Modifier = Modifier) {
+
     Box(modifier = Modifier
         .background(DeepBlue)
         .fillMaxSize()
-        .padding(20.dp)
+        .padding(30.dp)
     ) {
         Column(
             modifier = modifier
@@ -213,10 +227,20 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                     ) {
                     }
                 }
+                item {
+                    Box (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {}
+                }
             }
-            OptionButtons()
+
         }
     }
+    OptionButtons()
+
 }
 
 @Preview(showBackground = true, showSystemUi = true)
