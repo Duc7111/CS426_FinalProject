@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">A.S.H</string>
+    <string name="permission_granted">permission: INTERNET granted</string>
 </resources>
