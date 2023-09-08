@@ -1,11 +1,9 @@
 package com.example.ash
 
-import android.app.Application
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import org.junit.Test
 import java.io.File
-import java.security.AccessController.getContext
 
 class AttendeeTest {
 
