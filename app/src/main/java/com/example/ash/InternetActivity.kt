@@ -1,34 +1,31 @@
 package com.example.ash
 
-import android.content.pm.PackageManager
 import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import java.io.BufferedReader
+import java.net.HttpURLConnection
 import java.net.URL
 
 class InternetActivity: AppCompatActivity() {
-    private val fileUrl = "https://example.com/file.txt"
+
+    private val fileUrl = URL("https://drive.google.com/file/d/11kZ_b0JHfB2pOxV-HXyHTiTlaVhCfW3E/view?usp=sharing")
+    private val connection = fileUrl.openConnection() as HttpURLConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Request the internet permission
-
-
-        // Read the file
-        val inputStream = URL(fileUrl).openStream()
-        var fileContent = inputStream.bufferedReader().readLine()
-
-        // Modify the file
-        fileContent = fileContent.replace("Hello, world!", "Goodbye, world!")
-
-        // Write the file
-        val outputStream = URL(fileUrl).openConnection().outputStream
-        outputStream.write(fileContent.toByteArray())
+        requestPermissions(arrayOf(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE), 1)
+        if(!hasInternetAccess())
+        {
+            Log.i("Internet Access", "None")
+            return
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -38,48 +35,23 @@ class InternetActivity: AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // The internet permission has been granted
+        if (requestCode == 1 && grantResults.size == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            Log.i("Permissions", "Granted")
         } else {
-            // The internet permission has been denied
+            Log.i("Permissions", "Denied")
+            requestPermissions(arrayOf(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE), 1)
         }
     }
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                Log.i("Permission: ", "Granted")
-            } else {
-                Log.i("Permission: ", "Denied")
-            }
-        }
+    private fun hasInternetAccess(): Boolean {
+        val connectivityManager = getSystemService(ConnectivityManager::class.java)
+        val currentNetwork = connectivityManager.activeNetwork
+        return connectivityManager.getNetworkCapabilities(currentNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
+    }
 
-    fun onClickRequestPermission(view: View) {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.INTERNET
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                Log.i("Permission: ", "Granted")
-            }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.INTERNET
-            ) -> {
-                Log.i("Permission: ", "Denied")
-                requestPermissionLauncher.launch(
-                    Manifest.permission.INTERNET
-                )
-            }
-
-            else -> {
-                requestPermissionLauncher.launch(
-                    Manifest.permission.INTERNET
-                )
-            }
-        }
+    private fun read(): BufferedReader
+    {
+        connection.requestMethod = "GET"
+        return connection.inputStream.bufferedReader()
     }
 }
