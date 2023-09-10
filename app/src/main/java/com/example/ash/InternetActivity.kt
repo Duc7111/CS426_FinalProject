@@ -49,9 +49,15 @@ class InternetActivity: AppCompatActivity() {
         return connectivityManager.getNetworkCapabilities(currentNetwork)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
     }
 
-    private fun read(): BufferedReader
+    fun read(): String
     {
         connection.requestMethod = "GET"
-        return connection.inputStream.bufferedReader()
+        return connection.inputStream.bufferedReader().readText()
+    }
+
+    fun write(data: String)
+    {
+        connection.requestMethod = "POST"
+        connection.outputStream.write(data.toByteArray())
     }
 }
