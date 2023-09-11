@@ -1,25 +1,44 @@
 package com.example.ash
 
 import android.icu.util.Calendar
+import android.icu.util.TimeZone
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.util.Locale
 import java.util.Vector
 
 class DataHandler {
     companion object{
 
-        private fun dtToCalendar(dt: String): Calendar
+        private fun dtToCalendar(timezone: String = "",dt: String): Calendar
         {
             val calendar = Calendar.getInstance()
-
+            calendar.timeZone = TimeZone.getTimeZone(timezone)
+            val date = dt.substringBefore('T')
+                val year = date.substring(0, 3).toInt()
+                val month = date.substring(4, 5).toInt() - 1
+                val day = date.substring(5, 6).toInt()
+            val time = dt.substringAfter('T')
+                val hour = date.substring(0, 3).toInt()
+                val minute = date.substring(4, 5).toInt()
+            calendar.set(year, month, day, hour, minute)
+            calendar.timeZone = TimeZone.getDefault()
             return calendar
         }
 
-        private fun stringToAttendee(string: String): Attendee
+        private fun stringToAttendee(tags: List<String>, data: String): Attendee
         {
-            return Attendee()
+
+            var name = ""
+            var role = ""
+            var contact = ""
+            for (s in tags)
+            {
+
+            }
+            return Attendee(name, role, contact)
         }
 
         fun write(int: Int, fout: FileOutputStream)
@@ -90,9 +109,10 @@ class DataHandler {
             }
         }
 
-        fun icsToEvent(file: File): Event
+        fun icsToEvent(file: File): List<Event>
         {
-            if(!file.isFile) return Event()
+            val events = Vector<Event>()
+            if(!file.isFile) return events
             var summary = ""
             var description = ""
             var location = ""
@@ -100,19 +120,33 @@ class DataHandler {
             var endTime: Calendar? = null
             val attendees: Vector<Attendee> = Vector<Attendee>()
             val fin = file.inputStream()
-            fin.bufferedReader().lineSequence().forEach{
-                val data = it.substringAfter(':')
-                when(it.substringBefore(':'))
+            fin.bufferedReader().lineSequence().forEach{ string ->
+                val tag = string.substringBefore(':')
+                val data = string.substringAfter(':')
+                if(tag.all{
+                    it != ';'
+                })
+                when(tag)
                 {
                     "SUMMARY" -> summary = data
                     "DESCRIPTION" -> description = data
                     "LOCATION" -> location = data
-                    "DTSTART" -> startTime = dtToCalendar(data)
-                    "DTEND" -> endTime = dtToCalendar(data)
-                    "ATTENDEE" -> attendees.addElement(stringToAttendee(data))
+                    "DTSTART" -> startTime = dtToCalendar(dt = data)
+                    "DTEND" -> endTime = dtToCalendar(dt = data)
+                }
+                else
+                {
+                    val tags = string.split(';')
+                    when(tags[0])
+                    {
+                        "DTSTART" -> startTime = dtToCalendar(tags[1], data)
+                        "DTEND" -> endTime = dtToCalendar(tags[1], data)
+                        "Attendee" -> attendees.addElement(stringToAttendee(tags, data))
+                    }
                 }
             }
-            return Event(Event.Frequency.ONCE, summary, description, location, startTime, endTime, attendees)
+            events.addElement(Event(Event.Frequency.ONCE, summary, description, location, startTime, endTime, attendees))
+            return events.toList()
         }
     }
 }
