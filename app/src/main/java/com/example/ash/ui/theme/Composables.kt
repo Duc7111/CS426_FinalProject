@@ -11,13 +11,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,16 +35,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ash.Event
 import com.example.ash.R
 import java.time.format.TextStyle
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun FloatingWindowContent(/*event: Event ,*/) {
+fun FloatingWindowContent(event: Event) {
     var text by remember { mutableStateOf("The event summary is here") }
+    var isExpanded by remember {
+        mutableStateOf(false)
+    }
+    var frequency by remember {
+        mutableStateOf(event.getFrequency().toString())
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -45,15 +61,89 @@ fun FloatingWindowContent(/*event: Event ,*/) {
     ) {
         // Your content for the floating window
         Column() {
-            Text("Event Details")
             Text(
-                text = "Enter your text here",
+                text = "Press on the box to edit your event details",
+                modifier = Modifier.padding(10.dp)
+            )
+            Text(
+                text = "Frequency" ,
                 color = Color.Gray,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(10.dp)
+            )
+            ExposedDropdownMenuBox(
+                expanded = isExpanded,
+                onExpandedChange = {isExpanded = it}
+            ) {
+                TextField(
+                    value = frequency,
+                    onValueChange =  {
+                      frequency = it
+                    },
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                        .background(Color.White, shape = RoundedCornerShape(8.dp))
+                        .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                        .padding(8.dp)
+                        .menuAnchor(),
+                    singleLine = true, // Adjust this as needed
+                    textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors()
+                )
+                ExposedDropdownMenu(
+                    expanded = isExpanded,
+                    onDismissRequest = {isExpanded = false}
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(text = "ONCE") },
+                        onClick = {
+                            frequency = "ONCE"
+                            isExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "DAILY") },
+                        onClick = {
+                            frequency = "DAILY"
+                            isExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "WEEKLY") },
+                        onClick = {
+                            frequency = "WEEKLY"
+                            isExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "MONTHLY") },
+                        onClick = {
+                            frequency = "MONTHLY"
+                            isExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(text = "YEARLY") },
+                        onClick = {
+                            frequency = "YEARLY"
+                            isExpanded = false
+                        }
+                    )
+                }
+            }
+
+            Text(
+                text = "Summary" ,
+                color = Color.Gray,
+                modifier = Modifier.padding(10.dp)
             )
             BasicTextField(
-                value = text,
-                onValueChange = {
+                value = event.getSummary(),
+                onValueChange =  {
                     text = it
                 },
                 modifier = Modifier
@@ -65,6 +155,75 @@ fun FloatingWindowContent(/*event: Event ,*/) {
                 singleLine = true, // Adjust this as needed
                 textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black)
             )
+            Text(
+                text = "Location" /*event.getLocation()*/,
+                color = Color.Gray,
+                modifier = Modifier.padding(10.dp)
+            )
+            BasicTextField(
+                value = event.getLocation()
+                ,
+                onValueChange =  {
+                    text = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                    .padding(8.dp),
+                singleLine = true, // Adjust this as needed
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black)
+            )
+            Text(
+                text = "Description",
+                color = Color.Gray,
+                modifier = Modifier.padding(10.dp)
+            )
+            BasicTextField(
+                value = event.getDescription(),
+                readOnly = true,
+                onValueChange =  {
+                    text = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                    .padding(8.dp),
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black)
+            )
+            Text(
+                text = "Start Time",
+                color = Color.Gray,
+                modifier = Modifier.padding(10.dp)
+            )
+            BasicTextField(
+                value = event.getStartTime().getTime().toString(),
+                readOnly = true,
+                onValueChange =  {
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                    .padding(8.dp),
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black)
+            )
+            Text(
+                text = "Attendees",
+                color = Color.Gray,
+                modifier = Modifier.padding(10.dp)
+            )
+
+            LazyColumn(modifier = Modifier.padding(vertical = 5.dp)) {
+                item {
+                    /*Attendee button (show the information of the attendee)*/
+                }
+            }
+
         }
     }
 }
@@ -72,6 +231,15 @@ fun FloatingWindowContent(/*event: Event ,*/) {
 @Composable
 fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
     var isDialogVisible by remember { mutableStateOf(false) }
+
+    var summary : String = "Dinner date"
+    var location : String = "Haidilao"
+    var date : String = "September 3rd, 2023"
+    var startime : String = "7PM"
+    var description : String = "Remember to buy a bouquet of flowers and bla bla bla" +
+            "bla bla bla bla bla bla bla bla bla blabla bla bla bla blabla bla bla bla bla"
+
+    var current_event = Event(summary = summary, location = location, description = description)
 
 
     Button(
@@ -84,11 +252,6 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
             .padding(horizontal = 10.dp),
         shape = RoundedCornerShape(8.dp),
     ) {
-        var summary : String = "Dinner date"
-        var location : String = "Dinner date"
-        var date : String = "Dinner date"
-        var startime : String = "Dinner date"
-
         Text(
             text = "Dinner date" + " - " +
                     "Haidilao" + " - " +
@@ -116,7 +279,7 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
             },
             text = {
                 Column() {
-                    FloatingWindowContent()
+                    FloatingWindowContent(current_event)
 
                 }
                 // Display the floating window content
