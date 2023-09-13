@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,9 +46,8 @@ import com.example.ash.R
 import java.time.format.TextStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun FloatingWindowContent(event: Event) {
+fun EventDetails(event: Event, isEditable: Boolean = false ) {
     var text by remember { mutableStateOf("The event summary is here") }
     var isExpanded by remember {
         mutableStateOf(false)
@@ -62,17 +63,16 @@ fun FloatingWindowContent(event: Event) {
         // Your content for the floating window
         Column() {
             Text(
-                text = "Press on the box to edit your event details",
-                modifier = Modifier.padding(10.dp)
-            )
-            Text(
                 text = "Frequency" ,
                 color = Color.Gray,
                 modifier = Modifier.padding(10.dp)
             )
+
             ExposedDropdownMenuBox(
                 expanded = isExpanded,
-                onExpandedChange = {isExpanded = it}
+                onExpandedChange = {
+                        isExpanded = it
+                }
             ) {
                 TextField(
                     value = frequency,
@@ -90,49 +90,53 @@ fun FloatingWindowContent(event: Event) {
                     singleLine = true, // Adjust this as needed
                     textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                        if (isEditable)
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
                     },
                     colors = ExposedDropdownMenuDefaults.textFieldColors()
                 )
-                ExposedDropdownMenu(
-                    expanded = isExpanded,
-                    onDismissRequest = {isExpanded = false}
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = "ONCE") },
-                        onClick = {
-                            frequency = "ONCE"
-                            isExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = "DAILY") },
-                        onClick = {
-                            frequency = "DAILY"
-                            isExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = "WEEKLY") },
-                        onClick = {
-                            frequency = "WEEKLY"
-                            isExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = "MONTHLY") },
-                        onClick = {
-                            frequency = "MONTHLY"
-                            isExpanded = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = "YEARLY") },
-                        onClick = {
-                            frequency = "YEARLY"
-                            isExpanded = false
-                        }
-                    )
+                if (isEditable) {
+                    ExposedDropdownMenu(
+                        expanded = isExpanded,
+                        onDismissRequest = {isExpanded = false}
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(text = "ONCE") },
+                            onClick = {
+                                frequency = "ONCE"
+                                isExpanded = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(text = "DAILY") },
+                            onClick = {
+                                frequency = "DAILY"
+                                isExpanded = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(text = "WEEKLY") },
+                            onClick = {
+                                frequency = "WEEKLY"
+                                isExpanded = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(text = "MONTHLY") },
+                            onClick = {
+                                frequency = "MONTHLY"
+                                isExpanded = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(text = "YEARLY") },
+                            onClick = {
+                                frequency = "YEARLY"
+                                isExpanded = false
+                            }
+                        )
+                }
+
                 }
             }
 
@@ -153,7 +157,8 @@ fun FloatingWindowContent(event: Event) {
                     .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
                     .padding(8.dp),
                 singleLine = true, // Adjust this as needed
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black)
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
+                readOnly = !isEditable
             )
             Text(
                 text = "Location" /*event.getLocation()*/,
@@ -173,7 +178,8 @@ fun FloatingWindowContent(event: Event) {
                     .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
                     .padding(8.dp),
                 singleLine = true, // Adjust this as needed
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black)
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
+                readOnly = !isEditable
             )
             Text(
                 text = "Description",
@@ -182,7 +188,6 @@ fun FloatingWindowContent(event: Event) {
             )
             BasicTextField(
                 value = event.getDescription(),
-                readOnly = true,
                 onValueChange =  {
                     text = it
                 },
@@ -192,7 +197,8 @@ fun FloatingWindowContent(event: Event) {
                     .background(Color.White, shape = RoundedCornerShape(8.dp))
                     .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
                     .padding(8.dp),
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black)
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
+                readOnly = !isEditable
             )
             Text(
                 text = "Start Time",
@@ -201,7 +207,6 @@ fun FloatingWindowContent(event: Event) {
             )
             BasicTextField(
                 value = event.getStartTime().getTime().toString(),
-                readOnly = true,
                 onValueChange =  {
                 },
                 modifier = Modifier
@@ -210,7 +215,8 @@ fun FloatingWindowContent(event: Event) {
                     .background(Color.White, shape = RoundedCornerShape(8.dp))
                     .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
                     .padding(8.dp),
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black)
+                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
+                readOnly = !isEditable
             )
             Text(
                 text = "Attendees",
@@ -231,6 +237,7 @@ fun FloatingWindowContent(event: Event) {
 @Composable
 fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
     var isDialogVisible by remember { mutableStateOf(false) }
+    var isEditable by remember { mutableStateOf(false) }
 
     var summary : String = "Dinner date"
     var location : String = "Haidilao"
@@ -253,11 +260,11 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(8.dp),
     ) {
         Text(
-            text = "Dinner date" + " - " +
-                    "Haidilao" + " - " +
-                    "September 3rd, 2023" + " - " +
-                    "7PM" + " - " +
-                    "Bla bla bla bla bla bla bla bla bla bla bla bla bla",
+            text = "$summary" + " - " +
+                    "$location" + " - " +
+                    "$date" + " - " +
+                    "$startime" + " - " +
+                    "$description",
             color = TextWhite,
             maxLines = 1, // Set the maximum number of lines
             overflow = TextOverflow.Ellipsis // Truncate with ellipsis when text overflows)
@@ -273,28 +280,79 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
         AlertDialog(
             onDismissRequest = {
                 isDialogVisible = false
+                isEditable = false
             },
             title = {
-                Text("Event Details")
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp)
+                ) {
+                    Text(
+                        text = "Event Details",
+                        modifier = Modifier.weight(1f) // Make the Text take up available space
+                    )
+                    Button(
+                        onClick = {
+                            isEditable = true
+                        },
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.edit_icon), // Replace with your image resource
+                                contentDescription = null, // Provide a suitable content description
+                                modifier = Modifier.size(24.dp) // Adjust the size as needed
+                            )
+                            Text(
+                                text = "Edit",
+                                modifier = Modifier.padding(start = 8.dp) // Add padding between the image and text if needed
+                            )
+                        }
+                    }
+                }
+
             },
             text = {
                 Column() {
-                    FloatingWindowContent(current_event)
-
+                    EventDetails(current_event, isEditable)
                 }
                 // Display the floating window content
 
             },
             confirmButton = {
-                // Close button or actions
-                Button(
-                    onClick = {
-                        isDialogVisible = false
+                Row() {
+                    // Close button or actions
+                    Button(
+                        onClick = {
+                            if (!isEditable) isDialogVisible = false
+                            else isEditable = false
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        if (!isEditable) Text("Close")
+                        else Text("Cancel")
                     }
-                ) {
-                    Text("Close")
+                    if (isEditable) {
+                        Button(
+                            onClick = {
+                                isEditable = false
+                                /*save all the changes of the current events*/
+                            },
+                            modifier = Modifier.padding(horizontal = 5.dp)
+                        ) {
+                            Text("OK")
+                        }
+                    }
                 }
-            }
+
+            },
+//            dismissButton = {
+//
+//
+//            }
+
         )
     }
 }

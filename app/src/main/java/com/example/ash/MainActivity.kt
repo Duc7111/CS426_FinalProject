@@ -47,7 +47,7 @@ import com.example.ash.ui.theme.TextWhite
 import com.example.ash.ui.theme.Greeting
 import com.example.ash.ui.theme.EventButton
 import com.example.ash.ui.theme.OptionButtons
-import com.example.ash.ui.theme.FloatingWindowContent
+import com.example.ash.ui.theme.EventDetails
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
