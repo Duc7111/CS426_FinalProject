@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,6 +30,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +45,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.ash.Event
 import com.example.ash.R
 import java.time.format.TextStyle
@@ -48,13 +53,13 @@ import java.time.format.TextStyle
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetails(event: Event, isEditable: Boolean = false ) {
-    var text by remember { mutableStateOf("The event summary is here") }
-    var isExpanded by remember {
-        mutableStateOf(false)
-    }
-    var frequency by remember {
-        mutableStateOf(event.getFrequency().toString())
-    }
+    var summary by remember { mutableStateOf(event.getSummary()) }
+    var location by remember { mutableStateOf(event.getLocation()) }
+    var description by remember { mutableStateOf(event.getDescription()) }
+    var startime by remember { mutableStateOf(event.getStartTime().getTime().toString()) }
+    var isExpanded by remember { mutableStateOf(false) }
+    var frequency by remember { mutableStateOf(event.getFrequency().toString()) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -65,7 +70,9 @@ fun EventDetails(event: Event, isEditable: Boolean = false ) {
             Text(
                 text = "Frequency" ,
                 color = Color.Gray,
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier
+                    .padding(10.dp)
+                    .verticalScroll(rememberScrollState())
             )
 
             ExposedDropdownMenuBox(
@@ -146,9 +153,9 @@ fun EventDetails(event: Event, isEditable: Boolean = false ) {
                 modifier = Modifier.padding(10.dp)
             )
             BasicTextField(
-                value = event.getSummary(),
+                value = summary,
                 onValueChange =  {
-                    text = it
+                    summary = it
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -166,10 +173,10 @@ fun EventDetails(event: Event, isEditable: Boolean = false ) {
                 modifier = Modifier.padding(10.dp)
             )
             BasicTextField(
-                value = event.getLocation()
+                value = location
                 ,
                 onValueChange =  {
-                    text = it
+                    location = it
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -187,9 +194,9 @@ fun EventDetails(event: Event, isEditable: Boolean = false ) {
                 modifier = Modifier.padding(10.dp)
             )
             BasicTextField(
-                value = event.getDescription(),
+                value = description,
                 onValueChange =  {
-                    text = it
+                    description = it
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -206,8 +213,9 @@ fun EventDetails(event: Event, isEditable: Boolean = false ) {
                 modifier = Modifier.padding(10.dp)
             )
             BasicTextField(
-                value = event.getStartTime().getTime().toString(),
+                value = startime,
                 onValueChange =  {
+                    startime = it
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -233,11 +241,152 @@ fun EventDetails(event: Event, isEditable: Boolean = false ) {
         }
     }
 }
+@Composable
+fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, isNewEvent: Boolean, onClose: () -> Unit, onSave: () -> Unit, onDelete: () -> Unit) {
+
+    var isEditable by remember { mutableStateOf(false) }
+    if (isNewEvent) isEditable = true
+
+    AlertDialog(
+        onDismissRequest = {
+            if (!isViewOnly) isEditable = false
+            onClose()
+        },
+        title = {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                if (!isNewEvent)
+                    Text( text = "Event Details" )
+                else
+                    Text ( text = "New Event" )
+
+                if (!isViewOnly && !isNewEvent) {
+                    if (!isEditable) {
+                        Button(
+                            onClick = {
+                                isEditable = true
+                            }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.edit_icon), // Replace with your image resource
+                                    contentDescription = null, // Provide a suitable content description
+                                    modifier = Modifier.size(24.dp) // Adjust the size as needed
+                                )
+                                Text(
+                                    text = "Edit",
+                                    modifier = Modifier.padding(start = 8.dp) // Add padding between the image and text if needed
+                                )
+                            }
+                        }
+                    }
+                    else {
+                        Text(
+                            text = "Editing event mode",
+                            fontSize = 20.sp
+                        )
+                    }
+                }
+
+            }
+
+        },
+        text = {
+            Column() {
+                EventDetails(event, isEditable)
+            }
+
+        },
+        confirmButton = {
+            Row() {
+                //Cancel and Ok buttons when edit/add an event
+                if (isEditable) {
+                    Button( //Cancel
+                        onClick = {
+                            isEditable = false
+                            if (isNewEvent) {
+                                // Close without handling the data
+                                onClose()
+                            }
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button( //Save
+                        onClick = {
+                            isEditable = false
+                            onSave()
+                            if (isNewEvent) onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+
+        },
+        dismissButton = {
+            // The close button when viewing the event
+            if (!isEditable && !isNewEvent)
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                // Delete and Close button
+                    Button( //Delete event button
+                        onClick = {
+                            // Handle deleting the event here
+                            onDelete()
+                            // Raise the confirm dialog
+                            onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.trash_icon), // Replace with your image resource
+                                contentDescription = null, // Provide a suitable content description
+                                modifier = Modifier.size(24.dp) // Adjust the size as needed
+                            )
+                            Text(
+                                text = "Delete this event",
+                                modifier = Modifier.padding(start = 8.dp) // Add padding between the image and text if needed
+                            )
+                        }
+                    }
+                    Button( //Close dialog button
+                        onClick = {
+                            onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Text("Close")
+                    }
+                }
+
+        }
+
+    )
+}
+
 @Preview
 @Composable
 fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
-    var isDialogVisible by remember { mutableStateOf(false) }
-    var isEditable by remember { mutableStateOf(false) }
+    var showEventDialog by remember { mutableStateOf(false) }
+
 
     var summary : String = "Dinner date"
     var location : String = "Haidilao"
@@ -251,7 +400,7 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
 
     Button(
         onClick = {
-            isDialogVisible = true
+            showEventDialog = true
         },
         colors = ButtonDefaults.buttonColors(LightBlue),
         modifier = Modifier
@@ -276,86 +425,21 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
         Text(text = event.getStartTime().toString() + "\n", color = TextWhite)
         */
     }
-    if (isDialogVisible) {
-        AlertDialog(
-            onDismissRequest = {
-                isDialogVisible = false
-                isEditable = false
+    if (showEventDialog) {
+        EventDetailsDialog(
+            modifier = modifier,
+            event = current_event,
+            isViewOnly = false,
+            isNewEvent = false,
+            onClose = {
+                showEventDialog = false
             },
-            title = {
-                Row(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp)
-                ) {
-                    Text(
-                        text = "Event Details",
-                        modifier = Modifier.weight(1f) // Make the Text take up available space
-                    )
-                    Button(
-                        onClick = {
-                            isEditable = true
-                        },
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.edit_icon), // Replace with your image resource
-                                contentDescription = null, // Provide a suitable content description
-                                modifier = Modifier.size(24.dp) // Adjust the size as needed
-                            )
-                            Text(
-                                text = "Edit",
-                                modifier = Modifier.padding(start = 8.dp) // Add padding between the image and text if needed
-                            )
-                        }
-                    }
-                }
-
-            },
-            text = {
-                Column() {
-                    EventDetails(current_event, isEditable)
-                }
-                // Display the floating window content
-
-            },
-            confirmButton = {
-                Row() {
-                    // Close button or actions
-                    Button(
-                        onClick = {
-                            if (!isEditable) isDialogVisible = false
-                            else isEditable = false
-                        },
-                        modifier = Modifier.padding(horizontal = 5.dp)
-                    ) {
-                        if (!isEditable) Text("Close")
-                        else Text("Cancel")
-                    }
-                    if (isEditable) {
-                        Button(
-                            onClick = {
-                                isEditable = false
-                                /*save all the changes of the current events*/
-                            },
-                            modifier = Modifier.padding(horizontal = 5.dp)
-                        ) {
-                            Text("OK")
-                        }
-                    }
-                }
-
-            },
-//            dismissButton = {
-//
-//
-//            }
-
+            onSave = {},
+            onDelete = {}
         )
     }
 }
+
 @Preview
 @Composable
 fun OptionButtons(modifier: Modifier = Modifier) {
@@ -392,15 +476,18 @@ fun OptionButtons(modifier: Modifier = Modifier) {
             contentColor = Color.White
         ) {
             Image(
-                painter = painterResource(id = R.drawable.calendar), // Replace with your image resource
+                painter = painterResource(id = R.drawable.calendar),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
                     .scale(0.7f)
             )
         }
+        var showEventDialog by remember { mutableStateOf(false) }
         FloatingActionButton(
-            onClick = { /*Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show() */ },
+            onClick = {
+                showEventDialog = true
+            },
             Modifier
                 .background(color = Color.Transparent)
                 .padding(vertical = 5.dp)
@@ -408,13 +495,29 @@ fun OptionButtons(modifier: Modifier = Modifier) {
             contentColor = Color.White
         ) {
             Image(
-                painter = painterResource(id = R.drawable.plus), // Replace with your image resource
+                painter = painterResource(id = R.drawable.plus),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
                     .scale(0.7f)
             )
         }
+        if (showEventDialog) {
+            var newEvent = Event()
+            EventDetailsDialog(
+                modifier = modifier,
+                event = newEvent,
+                isViewOnly = false,
+                isNewEvent = true,
+                onClose = {
+                        showEventDialog = false
+                },
+                onSave = {},
+                onDelete = {}
+            )
+
+        }
+
     }
 }
 
