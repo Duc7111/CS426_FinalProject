@@ -44,8 +44,20 @@ class Event (
                 end2 > start1
             } else false
     }
-    enum class Frequency{
-        ONCE, YEARLY, MONTHLY, WEEKLY, DAILY
+    enum class Frequency(freq: String = "once"){
+        ONCE("once"), YEARLY("yearly"), MONTHLY("monthly"), WEEKLY("weekly"), DAILY("daily");
+
+        override fun toString(): String
+        {
+            return when(this)
+            {
+                Event.Frequency.ONCE -> "Once"
+                Event.Frequency.YEARLY -> "Yearly"
+                Event.Frequency.MONTHLY -> "Monthly"
+                Event.Frequency.WEEKLY -> "Weekly"
+                Event.Frequency.DAILY -> "Daily"
+            }
+        }
     }
 
     companion object
