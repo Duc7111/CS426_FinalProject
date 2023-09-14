@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -241,26 +242,30 @@ fun EventDetails(event: Event, isEditable: Boolean = false ) {
     }
 }
 @Composable
-fun EventDetailsDialog(modifier: Modifier, event: Event, showEventDialog: Boolean = false, onClose: () -> Unit) {
-    var isEditable by remember { mutableStateOf(false) }
+fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, isNewEvent: Boolean, onClose: () -> Unit, onSave: () -> Unit, onDelete: () -> Unit) {
 
-    if (showEventDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                //isDialogVisible = false
-                isEditable = false
-                onClose()
-            },
-            title = {
-                Row(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp)
-                ) {
-                    Text(
-                        text = "Event Details",
-                        modifier = Modifier.weight(1f) // Make the Text take up available space
-                    )
+    var isEditable by remember { mutableStateOf(false) }
+    if (isNewEvent) isEditable = true
+
+    AlertDialog(
+        onDismissRequest = {
+            if (!isViewOnly) isEditable = false
+            onClose()
+        },
+        title = {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                if (!isNewEvent)
+                    Text( text = "Event Details" )
+                else
+                    Text ( text = "New Event" )
+
+                if (!isViewOnly && !isNewEvent) {
                     if (!isEditable) {
                         Button(
                             onClick = {
@@ -290,47 +295,91 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, showEventDialog: Boolea
                     }
                 }
 
-            },
-            text = {
-                Column() {
-                    EventDetails(event, isEditable)
-                }
+            }
 
-            },
-            confirmButton = {
-                Row() {
-                    // Close button or actions
-                    Button(
+        },
+        text = {
+            Column() {
+                EventDetails(event, isEditable)
+            }
+
+        },
+        confirmButton = {
+            Row() {
+                //Cancel and Ok buttons when edit/add an event
+                if (isEditable) {
+                    Button( //Cancel
                         onClick = {
-                            if (!isEditable) onClose()
-                            else isEditable = false
+                            isEditable = false
+                            if (isNewEvent) {
+                                // Close without handling the data
+                                onClose()
+                            }
                         },
                         modifier = Modifier.padding(horizontal = 5.dp)
                     ) {
-                        if (!isEditable) Text("Close")
-                        else Text("Cancel")
+                        Text("Cancel")
                     }
-                    if (isEditable) {
-                        Button(
-                            onClick = {
-                                isEditable = false
-                                /*save all the changes of the current events*/
-                            },
-                            modifier = Modifier.padding(horizontal = 5.dp)
+                    Button( //Save
+                        onClick = {
+                            isEditable = false
+                            onSave()
+                            if (isNewEvent) onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+
+        },
+        dismissButton = {
+            // The close button when viewing the event
+            if (!isEditable && !isNewEvent)
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                // Delete and Close button
+                    Button( //Delete event button
+                        onClick = {
+                            // Handle deleting the event here
+                            onDelete()
+                            // Raise the confirm dialog
+                            onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("OK")
+                            Image(
+                                painter = painterResource(id = R.drawable.trash_icon), // Replace with your image resource
+                                contentDescription = null, // Provide a suitable content description
+                                modifier = Modifier.size(24.dp) // Adjust the size as needed
+                            )
+                            Text(
+                                text = "Delete this event",
+                                modifier = Modifier.padding(start = 8.dp) // Add padding between the image and text if needed
+                            )
                         }
+                    }
+                    Button( //Close dialog button
+                        onClick = {
+                            onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Text("Close")
                     }
                 }
 
-            },
-//            dismissButton = {
-//
-//
-//            }
+        }
 
-        )
-    }
+    )
 }
 
 @Preview
@@ -376,16 +425,21 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
         Text(text = event.getStartTime().toString() + "\n", color = TextWhite)
         */
     }
+    if (showEventDialog) {
         EventDetailsDialog(
             modifier = modifier,
             event = current_event,
-            showEventDialog = showEventDialog,
+            isViewOnly = false,
+            isNewEvent = false,
             onClose = {
                 showEventDialog = false
-            }
+            },
+            onSave = {},
+            onDelete = {}
         )
-
+    }
 }
+
 @Preview
 @Composable
 fun OptionButtons(modifier: Modifier = Modifier) {
@@ -450,9 +504,18 @@ fun OptionButtons(modifier: Modifier = Modifier) {
         }
         if (showEventDialog) {
             var newEvent = Event()
-            EventDetailsDialog(modifier = modifier, event = newEvent) {
+            EventDetailsDialog(
+                modifier = modifier,
+                event = newEvent,
+                isViewOnly = false,
+                isNewEvent = true,
+                onClose = {
+                        showEventDialog = false
+                },
+                onSave = {},
+                onDelete = {}
+            )
 
-            }
         }
 
     }
