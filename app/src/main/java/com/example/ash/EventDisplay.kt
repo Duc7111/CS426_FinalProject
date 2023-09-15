@@ -1,8 +1,12 @@
 package com.example.ash
 
+import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +33,7 @@ import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +42,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -80,46 +87,63 @@ fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
             )
         }
         item {
-            OutlinedTextField(
-                value = summary,
-                onValueChange = { summary = it },
-                label = { Text(text = "Frequency") },
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { freqExpanded = true }
-                    .onGloballyPositioned { coordinates ->
-                        freqSize = coordinates.size.toSize()
-                    },
-            )
-            DropdownMenu(
-                expanded = freqExpanded,
-                onDismissRequest = { freqExpanded = false },
-                modifier = Modifier
-                    .width(with(LocalDensity.current){freqSize.width.toDp()})
+            Box(
+                 modifier = Modifier
+                     .fillMaxWidth()
             )
             {
-                DropdownMenuItem(
-                    text = { Text("Once") },
-                    onClick = { frequency = Event.Frequency.ONCE },
-                )
-                DropdownMenuItem(
-                    text = { Text("Yearly") },
-                    onClick = { frequency = Event.Frequency.YEARLY },
-                )
-                DropdownMenuItem(
-                    text = { Text("Monthly") },
-                    onClick = { frequency = Event.Frequency.MONTHLY },
-                )
-                DropdownMenuItem(
-                    text = { Text("Weekly") },
-                    onClick = { frequency = Event.Frequency.WEEKLY },
-                )
-                DropdownMenuItem(
-                    text = { Text("Daily") },
-                    onClick = { frequency = Event.Frequency.DAILY },
-                )
 
+                OutlinedTextField(
+                    value = frequency.toString(),
+                    onValueChange = {  },
+                    label = { Text(text = "Frequency") },
+                    readOnly = true,
+                    interactionSource = remember { MutableInteractionSource() }
+                        .also { interactionSource ->
+                            LaunchedEffect(interactionSource) {
+                                interactionSource.interactions.collect {
+                                    if (it is PressInteraction.Release) {
+                                        freqExpanded = true
+                                    }
+                                }
+                            }
+                        },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { freqExpanded = true }
+                        .onGloballyPositioned { coordinates ->
+                            freqSize = coordinates.size.toSize()
+                        },
+                )
+                DropdownMenu(
+                    expanded = freqExpanded,
+                    onDismissRequest = { freqExpanded = false },
+                    modifier = Modifier
+                        .width(with(LocalDensity.current){freqSize.width.toDp()})
+                )
+                {
+                    DropdownMenuItem(
+                        text = { Text("Once") },
+                        onClick = { frequency = Event.Frequency.ONCE },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Yearly") },
+                        onClick = { frequency = Event.Frequency.YEARLY },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Monthly") },
+                        onClick = { frequency = Event.Frequency.MONTHLY },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Weekly") },
+                        onClick = { frequency = Event.Frequency.WEEKLY },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Daily") },
+                        onClick = { frequency = Event.Frequency.DAILY },
+                    )
+
+                }
             }
         }
         item {
@@ -149,22 +173,16 @@ fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
             )
         }
         item {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            TimeDisplay(
+                time = startTime,
+                onTimePick = { startTime = it },
+                label = "From"
             )
-            {
-                TimeDisplay(
-                    time = startTime,
-                    onTimePick = { startTime = it },
-                    label = "From"
-                )
-                TimeDisplay(
-                    time = endTime,
-                    onTimePick = { endTime = it },
-                    label = "To"
-                )
-            }
+            TimeDisplay(
+                time = endTime,
+                onTimePick = { endTime = it },
+                label = "To"
+            )
         }
         items (attendees)
         {
@@ -200,7 +218,7 @@ fun DateDisplay(
     )
     {
         Text(
-            text = "Date: ${DateFormat.getDateInstance().format(selectedDate)}"
+            text = "Date: ${selectedDate.get(Calendar.YEAR)}, ${selectedDate.get(Calendar.MONTH) + 1}, ${selectedDate.get(Calendar.DATE)}"
         )
 
         Button(onClick = { showDatePicker = true }) {
@@ -208,32 +226,32 @@ fun DateDisplay(
         }
     }
     
-
-    DatePickerDialog(
-        onDismissRequest = { showDatePicker = false },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    selectedDate.timeInMillis = datePickerState.selectedDateMillis!!
-                    onDateSelected(selectedDate)
-                    showDatePicker = false
+    if(showDatePicker)
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        selectedDate.timeInMillis = datePickerState.selectedDateMillis!!
+                        onDateSelected(selectedDate)
+                        showDatePicker = false
+                    }
+                )
+                {
+                    Text(text = "Confirm")
                 }
-            )
-            {
-                Text(text = "Confirm")
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDatePicker = false })
+                {
+                    Text(text = "Cancel")
+                }
             }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = { showDatePicker = false })
-            {
-                Text(text = "Cancel")
-            }
+        )
+        {
+            DatePicker(state = datePickerState)
         }
-    )
-    {
-        DatePicker(state = datePickerState)
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -241,7 +259,6 @@ fun DateDisplay(
 private fun TimeDisplay(time: List<Int>, onTimePick: (List<Int>) -> Unit, label: String)
 {
     val initTime = if(time.size != 2) listOf(0, 0) else time
-    var editing by remember { mutableStateOf(false) }
     val timePickerState = remember {
         TimePickerState(
             is24Hour = true,
@@ -250,49 +267,22 @@ private fun TimeDisplay(time: List<Int>, onTimePick: (List<Int>) -> Unit, label:
         )
     }
 
+
     OutlinedCard(
         shape = RoundedCornerShape(5.dp),
         modifier = Modifier
-            .clickable {
-                editing = true
-            }
+            .fillMaxWidth()
     )
     {
         Text(text = label)
 
         TimePicker(
             state = timePickerState,
-            layoutType = TimePickerLayoutType.Horizontal,
+            layoutType = TimePickerLayoutType.Vertical,
             modifier = Modifier
-                .fillMaxWidth()
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        )
-        {
-            TextButton(
-                enabled = editing,
-                onClick = {
-
-                    editing = false
-                }
-            )
-            {
-                Text(text = "Cancel")
-            }
-            TextButton(
-                enabled = editing,
-                onClick = {
-                    onTimePick(listOf(timePickerState.hour, timePickerState.minute))
-                    editing = false
-                }
-            )
-            {
-                Text(text = "Confirm")
-            }
-        }
     }
+    onTimePick(listOf(timePickerState.hour, timePickerState.minute))
 }
 
 @Composable
@@ -300,4 +290,23 @@ fun DisplayAttendee(it: Attendee) {
     OutlinedCard() {
 
     }
+}
+
+@Preview
+@Composable
+private fun Test()
+{
+    var event by remember { mutableStateOf(Event()) }
+    EventDisplay(event)
+    {
+        event = it
+    }
+}
+
+@Preview
+@Composable
+private fun TestDate()
+{
+    var date by remember { mutableStateOf(Calendar.getInstance()) }
+    DateDisplay(initialDate = date, onDateSelected = {date = it})
 }
