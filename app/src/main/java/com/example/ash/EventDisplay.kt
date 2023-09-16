@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -42,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.google.android.material.datepicker.MaterialDatePicker
+import org.jetbrains.annotations.Nullable
 import java.text.DateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -75,7 +82,7 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
 
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        //horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
     )
     {
@@ -118,35 +125,35 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
                             freqSize = coordinates.size.toSize()
                         },
                 )
-                if (isEditable)
-                DropdownMenu(
-                    expanded = freqExpanded,
-                    onDismissRequest = { freqExpanded = false },
-                    modifier = Modifier
-                        .width(with(LocalDensity.current){freqSize.width.toDp()})
-                )
-                {
-                    DropdownMenuItem(
-                        text = { Text("Once") },
-                        onClick = { frequency = Event.Frequency.ONCE },
+                if (isEditable) {
+                    DropdownMenu(
+                        expanded = freqExpanded,
+                        onDismissRequest = { freqExpanded = false },
+                        modifier = Modifier
+                            .width(with(LocalDensity.current){freqSize.width.toDp()})
                     )
-                    DropdownMenuItem(
-                        text = { Text("Yearly") },
-                        onClick = { frequency = Event.Frequency.YEARLY },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Monthly") },
-                        onClick = { frequency = Event.Frequency.MONTHLY },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Weekly") },
-                        onClick = { frequency = Event.Frequency.WEEKLY },
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Daily") },
-                        onClick = { frequency = Event.Frequency.DAILY },
-                    )
-
+                    {
+                        DropdownMenuItem(
+                            text = { Text("Once") },
+                            onClick = { frequency = Event.Frequency.ONCE },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Yearly") },
+                            onClick = { frequency = Event.Frequency.YEARLY },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Monthly") },
+                            onClick = { frequency = Event.Frequency.MONTHLY },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Weekly") },
+                            onClick = { frequency = Event.Frequency.WEEKLY },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Daily") },
+                            onClick = { frequency = Event.Frequency.DAILY },
+                        )
+                }
                 }
             }
         }
@@ -193,14 +200,43 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
                 isEditable = isEditable
             )
         }
-        items (attendees)
-        {
-            DisplayAttendee(it)
+        item {
+            Text(text = "test")
         }
-    }
-
-
-
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            Text(text = "test")
+        }
+        item {
+            DisplayAttendee(attendees = attendees)
+            }
+        }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -291,11 +327,9 @@ fun TimeDisplay(time: List<Int>, onTimePick: (List<Int>) -> Unit, label: String,
     val context = LocalContext.current
     val hour = initTime[0]
     val minute = initTime[1]
-    val timerSelectedStore = remember {
-        mutableStateOf("")
-    }
-    var hourSelect: Int = 0
-    var minuteSelect: Int = 0
+    val timerSelectedStore = remember { mutableStateOf("${initTime[0]}:${initTime[1]}") }
+    var hourSelect: Int = initTime[0]
+    var minuteSelect: Int = initTime[1]
 
     val mTimePickerDialog = TimePickerDialog(
         context,
@@ -353,9 +387,53 @@ fun TimePickCard(timePickerState: TimePickerState, onTimePick: (List<Int>) -> Un
 }
 
 @Composable
-fun DisplayAttendee(it: Attendee) {
-    OutlinedCard() {
+fun DisplayAttendee(attendees: Vector<Attendee>) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp) // Set the desired height here
+    ) {
+        OutlinedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Text(
+                    text = "Attendees",
+                    color = Color.Gray,
+                    modifier = Modifier.padding(10.dp)
+                )
+                if (attendees.size != 0) {
+                    Column(
+                        modifier = Modifier.verticalScroll(rememberScrollState())
+                    ) {
+                        attendees.forEach { attendee ->
+                            Text(
+                                text = "${attendee.getName()}",
+                                color = Color.Black,
+                                modifier = Modifier
+                                    .padding(10.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                    }
 
+                } else {
+                    Text(
+                        text = "No attendees",
+                        color = Color.Black,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
+                Box(
+                    modifier = Modifier.height(50.dp)
+                )
+            }
+        }
     }
 }
 
