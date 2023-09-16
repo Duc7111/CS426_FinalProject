@@ -2,6 +2,7 @@ package com.example.ash
 
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
+import android.widget.TimePicker
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -43,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,7 +59,7 @@ import java.util.Vector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
+fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventChange: (Event) -> Unit)
 {
     var frequency by remember { mutableStateOf(event.getFrequency()) }
     var summary by remember { mutableStateOf(event.getSummary()) }
@@ -83,7 +85,8 @@ fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
                 onValueChange = { summary = it },
                 label = { Text(text = "Summary") },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                readOnly = !isEditable
             )
         }
         item {
@@ -115,6 +118,7 @@ fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
                             freqSize = coordinates.size.toSize()
                         },
                 )
+                if (isEditable)
                 DropdownMenu(
                     expanded = freqExpanded,
                     onDismissRequest = { freqExpanded = false },
@@ -152,7 +156,8 @@ fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
                 onValueChange = { description = it },
                 label = { Text(text = "Description") },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                readOnly = !isEditable
             )
         }
         item {
@@ -161,7 +166,8 @@ fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
                 onValueChange = { location = it },
                 label = { Text(text = "Location") },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                readOnly = !isEditable
             )
         }
         item {
@@ -169,19 +175,22 @@ fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
                 initialDate = date,
                 onDateSelected = {
                     date = it
-                }
+                },
+                isEditable = isEditable
             )
         }
         item {
             TimeDisplay(
                 time = startTime,
                 onTimePick = { startTime = it },
-                label = "From"
+                label = "From",
+                isEditable = isEditable
             )
             TimeDisplay(
                 time = endTime,
                 onTimePick = { endTime = it },
-                label = "To"
+                label = "To",
+                isEditable = isEditable
             )
         }
         items (attendees)
@@ -198,6 +207,7 @@ fun EventDisplay(event: Event = Event(), onEventChange: (Event) -> Unit)
 @Composable
 fun DateDisplay(
     onDateSelected: (Calendar) -> Unit,
+    isEditable: Boolean = false,
     initialDate: Calendar = Calendar.getInstance()
 )
 {
@@ -213,6 +223,7 @@ fun DateDisplay(
     )
 
     Row(
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     )
@@ -221,7 +232,7 @@ fun DateDisplay(
             text = "Date: ${selectedDate.get(Calendar.YEAR)}, ${selectedDate.get(Calendar.MONTH) + 1}, ${selectedDate.get(Calendar.DATE)}"
         )
 
-        Button(onClick = { showDatePicker = true }) {
+        Button(onClick = { showDatePicker = true }, modifier = Modifier.padding(10.dp), enabled = isEditable) {
             Text(text = "Change")
         }
     }
@@ -256,7 +267,7 @@ fun DateDisplay(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TimeDisplay(time: List<Int>, onTimePick: (List<Int>) -> Unit, label: String)
+fun TimeDisplay(time: List<Int>, onTimePick: (List<Int>) -> Unit, label: String, isEditable: Boolean = false)
 {
     val initTime = if(time.size != 2) listOf(0, 0) else time
     val timePickerState = remember {
@@ -266,20 +277,76 @@ private fun TimeDisplay(time: List<Int>, onTimePick: (List<Int>) -> Unit, label:
             initialMinute = initTime[1]
         )
     }
+    /*
+    var timePicked by remember { mutableStateOf(time) }
+    TimePickCard(
+        timePickerState = timePickerState,
+        onTimePick = {timePicked = it},
+        label = label
+    )
+    onTimePick(timePicked)
+    */
 
+
+    val context = LocalContext.current
+    val hour = initTime[0]
+    val minute = initTime[1]
+    val timerSelectedStore = remember {
+        mutableStateOf("")
+    }
+    var hourSelect: Int = 0
+    var minuteSelect: Int = 0
+
+    val mTimePickerDialog = TimePickerDialog(
+        context,
+        {
+            timePicker: TimePicker, hourSelected: Int, minuteSelected: Int ->
+            hourSelect = hourSelected
+            minuteSelect = minuteSelected
+            timerSelectedStore.value = "$hourSelected:$minuteSelected"
+        },
+        hour, minute, true
+    )
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Text(text = label + ": ${timerSelectedStore.value}")
+        Button(
+            onClick = {
+                mTimePickerDialog.show()
+            },
+            enabled = isEditable
+        ) {
+            Text(text = "Change")
+        }
+    }
+
+    onTimePick(listOf(hourSelect, minuteSelect))
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePickCard(timePickerState: TimePickerState, onTimePick: (List<Int>) -> Unit, label: String) {
 
     OutlinedCard(
         shape = RoundedCornerShape(5.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .padding(vertical = 5.dp),
     )
     {
-        Text(text = label)
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
 
         TimePicker(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             state = timePickerState,
-            layoutType = TimePickerLayoutType.Vertical,
-            modifier = Modifier
+            layoutType = TimePickerLayoutType.Vertical
         )
     }
     onTimePick(listOf(timePickerState.hour, timePickerState.minute))

@@ -49,6 +49,7 @@ import com.example.ash.ui.theme.EventButton
 import com.example.ash.ui.theme.OptionButtons
 import com.example.ash.ui.theme.EventDetails
 import com.example.ash.ui.theme.EventDetailsDialog
+import com.example.ash.EventDisplay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +63,12 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Homescreen(name = "Phoenix")
+
+                    /*var event by remember { mutableStateOf(Event()) }
+                    EventDisplay(event)
+                    {
+                        event = it
+                    }*/
                 }
             }
         }
