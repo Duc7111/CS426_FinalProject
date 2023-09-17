@@ -2,6 +2,7 @@ package com.example.ash
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils.indexOf
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -47,11 +49,13 @@ import com.example.ash.ui.theme.TextWhite
 import com.example.ash.ui.theme.Greeting
 import com.example.ash.ui.theme.EventButton
 import com.example.ash.ui.theme.OptionButtons
-import com.example.ash.ui.theme.EventDetails
 import com.example.ash.ui.theme.EventDetailsDialog
 import com.example.ash.EventDisplay
+import kotlin.collections.EmptyList.indexOf
 
 class MainActivity : ComponentActivity() {
+
+    val scheduleInstance = Schedule.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         println("onCreate()")
@@ -62,13 +66,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Homescreen(name = "Phoenix")
+                    Homescreen(schedule = scheduleInstance ,name = "Phoenix")
 
-                    /*var event by remember { mutableStateOf(Event()) }
-                    EventDisplay(event)
-                    {
-                        event = it
-                    }*/
                 }
             }
         }
@@ -106,7 +105,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Homescreen(name: String, modifier: Modifier = Modifier) {
+fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
+
+
+    var OnceEvents by remember { mutableStateOf(schedule.getOnceEvents())}
+    var DailyEvents by remember { mutableStateOf(schedule.getDailyEvents())}
+    var WeeklyEvents by remember { mutableStateOf(schedule.getWeeklyEvents())}
+    var MonthlyEvents by remember { mutableStateOf(schedule.getMonthlyEvents())}
+    var YearlyEvents by remember { mutableStateOf(schedule.getYearlyEvents())}
+
 
     Box(modifier = Modifier
         .background(DeepBlue)
@@ -141,12 +148,30 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                         contentAlignment = Alignment.TopStart
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
-                            item {
-                                EventButton(modifier = modifier)
+                            items(OnceEvents) { onceEvent ->
+                                var mutableOnceEvent by remember { mutableStateOf(onceEvent) }
+
+                                EventButton(
+                                    event = mutableOnceEvent,
+                                    modifier = modifier,
+                                    onSave = { updatedEvent ->
+                                        // Update the mutable variable with the changes
+                                        mutableOnceEvent = updatedEvent
+                                        //save the updated event to the original list
+                                        var index = OnceEvents.indexOf(onceEvent)
+
+                                        // If the index is valid (not -1), update the original list
+                                        if (index != -1) {
+                                            //OnceEvents.set(index, updatedEvent)
+                                        }
+                                    },
+                                    onDelete = { schedule.removeEvent(it) }
+                                )
+                            }
                             }
                         }
                     }
-                }
+
                 item {
                     Text(
                         text = "Daily events",
@@ -167,6 +192,11 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                             ), // Set the background color
                         contentAlignment = Alignment.Center
                     ) {
+                        LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
+                            items(DailyEvents) {DailyEvent ->
+                                EventButton(event = DailyEvent, modifier = modifier, onSave = {}, onDelete = {})
+                            }
+                        }
                     }
                 }
                 item {
@@ -189,6 +219,11 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                             ), // Set the background color
                         contentAlignment = Alignment.Center
                     ) {
+                        LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
+                            items(WeeklyEvents) {WeeklyEvent ->
+                                EventButton(event = WeeklyEvent, modifier = modifier, onSave = {}, onDelete = {})
+                            }
+                        }
                     }
                 }
                 item {
@@ -211,6 +246,7 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                             ), // Set the background color
                         contentAlignment = Alignment.Center
                     ) {
+                        EventButton(event = MonthlyEvent, modifier = modifier, onSave = {}, onDelete = {})
                     }
                 }
                 item {
@@ -233,6 +269,11 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
                             ), // Set the background color
                         contentAlignment = Alignment.Center
                     ) {
+                        LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
+                            items(YearlyEvents) {YearlyEvent ->
+                                EventButton(event = YearlyEvent, modifier = modifier, onSave = {}, onDelete = {})
+                            }
+                        }
                     }
                 }
                 item {
@@ -255,6 +296,6 @@ fun Homescreen(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     ASHTheme {
-        Homescreen(name = "Andrew")
+        Homescreen(schedule = Schedule.getInstance(),name = "Andrew")
     }
 }

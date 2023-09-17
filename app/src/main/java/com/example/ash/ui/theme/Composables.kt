@@ -1,5 +1,8 @@
 package com.example.ash.ui.theme
 
+import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,209 +39,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ash.BubbleDisplay
 import com.example.ash.Event
 import com.example.ash.EventDisplay
 import com.example.ash.R
+import com.example.ash.bubbleDisplay
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun EventDetails(event: Event, isEditable: Boolean = false ) {
-    var summary by remember { mutableStateOf(event.getSummary()) }
-    var location by remember { mutableStateOf(event.getLocation()) }
-    var description by remember { mutableStateOf(event.getDescription()) }
-    var startime by remember { mutableStateOf(event.getStartTime().getTime().toString()) }
-    var isExpanded by remember { mutableStateOf(false) }
-    var frequency by remember { mutableStateOf(event.getFrequency().toString()) }
+fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, isNewEvent: Boolean, onClose: () -> Unit, onSave: (Event) -> Unit, onDelete: (Event) -> Unit) {
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White) // Set your desired background color
-    ) {
-        // Your content for the floating window
-        Column() {
-            Text(
-                text = "Frequency" ,
-                color = Color.Gray,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .verticalScroll(rememberScrollState())
-            )
-
-            ExposedDropdownMenuBox(
-                expanded = isExpanded,
-                onExpandedChange = {
-                        isExpanded = it
-                }
-            ) {
-                TextField(
-                    value = frequency,
-                    onValueChange =  {
-                      frequency = it
-                    },
-                    readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(5.dp)
-                        .background(Color.White, shape = RoundedCornerShape(8.dp))
-                        .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                        .padding(8.dp)
-                        .menuAnchor(),
-                    singleLine = true, // Adjust this as needed
-                    textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
-                    trailingIcon = {
-                        if (isEditable)
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-                    },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors()
-                )
-                if (isEditable) {
-                    ExposedDropdownMenu(
-                        expanded = isExpanded,
-                        onDismissRequest = {isExpanded = false}
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(text = "ONCE") },
-                            onClick = {
-                                frequency = "ONCE"
-                                isExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(text = "DAILY") },
-                            onClick = {
-                                frequency = "DAILY"
-                                isExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(text = "WEEKLY") },
-                            onClick = {
-                                frequency = "WEEKLY"
-                                isExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(text = "MONTHLY") },
-                            onClick = {
-                                frequency = "MONTHLY"
-                                isExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(text = "YEARLY") },
-                            onClick = {
-                                frequency = "YEARLY"
-                                isExpanded = false
-                            }
-                        )
-                }
-
-                }
-            }
-
-            Text(
-                text = "Summary" ,
-                color = Color.Gray,
-                modifier = Modifier.padding(10.dp)
-            )
-            BasicTextField(
-                value = summary,
-                onValueChange =  {
-                    summary = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                singleLine = true, // Adjust this as needed
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
-                readOnly = !isEditable
-            )
-            Text(
-                text = "Location" /*event.getLocation()*/,
-                color = Color.Gray,
-                modifier = Modifier.padding(10.dp)
-            )
-            BasicTextField(
-                value = location
-                ,
-                onValueChange =  {
-                    location = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                singleLine = true, // Adjust this as needed
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
-                readOnly = !isEditable
-            )
-            Text(
-                text = "Description",
-                color = Color.Gray,
-                modifier = Modifier.padding(10.dp)
-            )
-            BasicTextField(
-                value = description,
-                onValueChange =  {
-                    description = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
-                readOnly = !isEditable
-            )
-            Text(
-                text = "Start Time",
-                color = Color.Gray,
-                modifier = Modifier.padding(10.dp)
-            )
-            BasicTextField(
-                value = startime,
-                onValueChange =  {
-                    startime = it
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-                    .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                textStyle = androidx.compose.ui.text.TextStyle(color = Color.Black),
-                readOnly = !isEditable
-            )
-            Text(
-                text = "Attendees",
-                color = Color.Gray,
-                modifier = Modifier.padding(10.dp)
-            )
-
-            LazyColumn(modifier = Modifier.padding(vertical = 5.dp)) {
-                item {
-                    /*Attendee button (show the information of the attendee)*/
-                }
-            }
-
-        }
+    var changedEvent by remember {
+        mutableStateOf(event)
     }
-}
-@Composable
-fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, isNewEvent: Boolean, onClose: () -> Unit, onSave: () -> Unit, onDelete: () -> Unit) {
 
     var isEditable by remember { mutableStateOf(false) }
     if (isNewEvent) isEditable = true
@@ -297,10 +117,10 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, is
         },
         text = {
                 //EventDetails(event, isEditable)
-                EventDisplay(event, isEditable, onEventChange = {})
+            EventDisplay(changedEvent, isEditable, onEventChange = {changedEvent = it})
 
         },
-        confirmButton = {
+        dismissButton = {
             Row() {
                 //Cancel and Ok buttons when edit/add an event
                 if (isEditable) {
@@ -319,7 +139,7 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, is
                     Button( //Save
                         onClick = {
                             isEditable = false
-                            onSave()
+                            onSave(changedEvent)
                             if (isNewEvent) onClose()
                         },
                         modifier = Modifier.padding(horizontal = 5.dp)
@@ -330,43 +150,34 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, is
             }
 
         },
-        dismissButton = {
+        confirmButton = {
             // The close button when viewing the event
             if (!isEditable && !isNewEvent)
-                Row(
-                    modifier = modifier,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row() {
                 // Delete and Close button
                     Button( //Delete event button
                         onClick = {
                             // Handle deleting the event here
-                            onDelete()
+                            onDelete(event)
                             // Raise the confirm dialog
                             onClose()
-                        },
-                        modifier = Modifier.padding(horizontal = 20.dp)
+                        }
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Row() {
                             Image(
                                 painter = painterResource(id = R.drawable.trash_icon), // Replace with your image resource
                                 contentDescription = null, // Provide a suitable content description
                                 modifier = Modifier.size(24.dp) // Adjust the size as needed
                             )
                             Text(
-                                text = "Delete this event",
-                                modifier = Modifier.padding(start = 8.dp) // Add padding between the image and text if needed
+                                text = "Delete this event"
                             )
                         }
                     }
                     Button( //Close dialog button
                         onClick = {
                             onClose()
-                        },
-                        //modifier = Modifier.padding(horizontal = 50.dp)
+                        }
                     ) {
                         Text("Close")
                     }
@@ -379,18 +190,18 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, is
 
 @Preview
 @Composable
-fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
+fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) -> Unit, onDelete: (Event) -> Unit) {
     var showEventDialog by remember { mutableStateOf(false) }
+    var changedEvent by remember { mutableStateOf(event) }
 
+//    var summary : String = "Dinner date"
+//    var location : String = "Haidilao"
+//    var date : String = "September 3rd, 2023"
+//    var startime : String = "7PM"
+//    var description : String = "Remember to buy a bouquet of flowers and bla bla bla" +
+//            "bla bla bla bla bla bla bla bla bla blabla bla bla bla blabla bla bla bla bla"
 
-    var summary : String = "Dinner date"
-    var location : String = "Haidilao"
-    var date : String = "September 3rd, 2023"
-    var startime : String = "7PM"
-    var description : String = "Remember to buy a bouquet of flowers and bla bla bla" +
-            "bla bla bla bla bla bla bla bla bla blabla bla bla bla blabla bla bla bla bla"
-
-    var current_event = Event(summary = summary, location = location, description = description)
+//    var current_event = Event(summary = summary, location = location, description = description)
 
 
     Button(
@@ -404,11 +215,11 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(8.dp),
     ) {
         Text(
-            text = "$summary" + " - " +
-                    "$location" + " - " +
-                    "$date" + " - " +
-                    "$startime" + " - " +
-                    "$description",
+            text = "${event.getSummary()}" + " - " +
+                    "${event.getLocation()}" + " - " +
+                    "${event.getDate()}" + " - " +
+                    "${event.getStartTime()}" + " - " +
+                    "${event.getDescription()}",
             color = TextWhite,
             maxLines = 1, // Set the maximum number of lines
             overflow = TextOverflow.Ellipsis // Truncate with ellipsis when text overflows)
@@ -423,18 +234,24 @@ fun EventButton(/*event: Event ,*/ modifier: Modifier = Modifier) {
     if (showEventDialog) {
         EventDetailsDialog(
             modifier = modifier,
-            event = current_event,
+            event = changedEvent,
             isViewOnly = false,
             isNewEvent = false,
             onClose = {
                 showEventDialog = false
             },
-            onSave = {},
-            onDelete = {}
+            onSave = {
+                changedEvent = it
+                onSave(changedEvent)
+            },
+            onDelete = {
+                onDelete(event)
+            }
         )
     }
 }
 
+//@RequiresApi(Build.VERSION_CODES.Q)
 @Preview
 @Composable
 fun OptionButtons(modifier: Modifier = Modifier) {
@@ -446,8 +263,13 @@ fun OptionButtons(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.End
     ) {
+        //val context = LocalContext.current
+        var isBubbleDisplay by remember { mutableStateOf(false) }
         FloatingActionButton(
-            onClick = { /*Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show() */ },
+            onClick = {
+                //context.startActivity(Intent(context, BubbleDisplay::class.java))
+                      isBubbleDisplay = true
+            },
             Modifier
                 .background(color = Color.Transparent)
                 .padding(vertical = 5.dp)
@@ -496,6 +318,9 @@ fun OptionButtons(modifier: Modifier = Modifier) {
                     .fillMaxSize()
                     .scale(0.7f)
             )
+        }
+        if (isBubbleDisplay) {
+            //bubbleDisplay()
         }
         if (showEventDialog) {
             var newEvent = Event()

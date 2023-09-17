@@ -80,6 +80,7 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
     var freqExpanded by remember { mutableStateOf(false) }
     var freqSize by remember { mutableStateOf(Size.Zero) }
 
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(5.dp),
         //horizontalAlignment = Alignment.CenterHorizontally,
@@ -201,42 +202,11 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
             )
         }
         item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
-            Text(text = "test")
-        }
-        item {
             DisplayAttendee(attendees = attendees)
             }
         }
+
+    onEventChange(Event(frequency = frequency, summary = summary, description = description, location = location, startTime = date, attendees = attendees))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
