@@ -1,8 +1,11 @@
 package com.example.ash
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import android.app.Person
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import com.example.ash.ui.theme.ASHTheme
 import com.example.ash.ui.theme.DeepBlue
 import com.example.ash.ui.theme.EventButton
@@ -33,11 +42,26 @@ import com.example.ash.ui.theme.MediumBlue
 import com.example.ash.ui.theme.OptionButtons
 import com.example.ash.ui.theme.TextWhite
 
+@RequiresApi(Build.VERSION_CODES.P)
+val person = Person.Builder()
+    .setName("A.S.H")
+    .setImportant(true)
+    .build()
+
 class MainActivity : ComponentActivity() {
 
+    private lateinit var bubbleViewModel: BubbleViewModel
     val scheduleInstance = Schedule.getInstance()
+
+
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
+        bubbleViewModel = ViewModelProvider(this)[BubbleViewModel::class.java]
+
         println("onCreate()")
         setContent {
             ASHTheme {
@@ -47,6 +71,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Homescreen(schedule = scheduleInstance ,name = "Phoenix")
+                    {
+                        bubbleViewModel.showBubble()
+                    }
 
                 }
             }
@@ -85,7 +112,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
+fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier, onBubbleDisplay: () -> Unit) {
 
 
     var OnceEvents by remember { mutableStateOf(schedule.getOnceEvents())}
@@ -272,8 +299,7 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
 
         }
     }
-    OptionButtons()
-
+    OptionButtons(onBubbleDisplay = onBubbleDisplay)
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -281,5 +307,8 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
     ASHTheme {
         Homescreen(schedule = Schedule.getInstance(),name = "Andrew")
+        {
+
+        }
     }
 }
