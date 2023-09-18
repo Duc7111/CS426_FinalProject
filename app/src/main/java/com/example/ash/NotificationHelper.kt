@@ -8,8 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.text.format.Time
 import androidx.annotation.RequiresApi
 import androidx.annotation.WorkerThread
+import androidx.core.app.Person
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
 
 class NotificationHelper(private val context: Context) {
     companion object {
@@ -42,6 +46,15 @@ class NotificationHelper(private val context: Context) {
     @WorkerThread
     fun showNotification(fromUser : Boolean) {
 
+        ShortcutManagerCompat.addDynamicShortcuts(context, listOf(
+            ShortcutInfoCompat.Builder(context, "ash")
+            .setLongLived(true)
+            .setLongLabel("A.S.H bubble")
+            .setShortLabel("A.S.H")
+            .setIntent(Intent(Intent.ACTION_VIEW).setClass(context, BubbleDisplay::class.java))
+            .setPerson(Person.Builder().setName(person.name).build())
+            .build()))
+
         val builder = Notification.Builder(context, CHANNEL_SCHEDULE)
             .setBubbleMetadata(
                 Notification.BubbleMetadata.Builder()
@@ -51,7 +64,7 @@ class NotificationHelper(private val context: Context) {
                         // TODO: This does not yet work in Android Q Beta 2.
                         if (fromUser) {
                             setAutoExpandBubble(true)
-                            //setSuppressInitialNotification(true)
+                            setSuppressNotification(true)
                         }
                     }
                     .setIntent(
@@ -67,9 +80,13 @@ class NotificationHelper(private val context: Context) {
                     .build()
             )
             .setContentTitle("Schedule")
+            .setShortcutId("ash")
             .setSmallIcon(R.drawable.ic_file_black_24dp)
-            .setCategory(Notification.CATEGORY_STATUS)
+            .setCategory(Notification.CATEGORY_MESSAGE)
             .setShowWhen(true)
+            .setAutoCancel(false)
+            .setStyle(Notification.MessagingStyle(person)
+                .addMessage("Bubble activated", 0, "A.S.H"))
         notificationManager.notify(0, builder.build())
     }
 

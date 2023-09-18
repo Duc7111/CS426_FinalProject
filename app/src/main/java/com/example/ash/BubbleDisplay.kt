@@ -51,6 +51,9 @@ private fun bubbleDisplay() {
             color = MaterialTheme.colorScheme.background
         ) {
             Homescreen(schedule = Schedule.getInstance(),name = "Phoenix")
+            {
+
+            }
         }
     }
 }

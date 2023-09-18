@@ -239,7 +239,6 @@ fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) ->
 }
 
 //@RequiresApi(Build.VERSION_CODES.Q)
-@Preview
 @Composable
 fun OptionButtons(modifier: Modifier = Modifier, onAddNewEvent: (Event) -> Unit) {
     Column(
@@ -307,7 +306,7 @@ fun OptionButtons(modifier: Modifier = Modifier, onAddNewEvent: (Event) -> Unit)
             )
         }
         if (isBubbleDisplay) {
-            //bubbleDisplay()
+            onBubbleDisplay()
         }
         if (showEventDialog) {
             EventDetailsDialog(
