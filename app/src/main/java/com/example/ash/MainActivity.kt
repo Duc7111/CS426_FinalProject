@@ -61,14 +61,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val fin = this.applicationContext.openFileInput("appData.txt")
-        TheSchedule = if(fin.read() == -1)
-            Schedule.getInstance(null)
-        else {
-            fin.skip(-1)
-            Schedule.getInstance(fin)
+        val file = File(this.applicationContext.filesDir, "appData2.txt")
+
+        TheSchedule = if(file.isFile)
+        {
+            val fin = this.applicationContext.openFileInput("appData2.txt")
+            Schedule.getInstance(fin).also{fin.close()}
         }
-        fin.close()
+        else {
+            Schedule.getInstance(null)
+        }
 
         bubbleViewModel = ViewModelProvider(this)[BubbleViewModel::class.java]
 
@@ -105,7 +107,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
-        val fout = this.applicationContext.openFileOutput("appData.txt", Context.MODE_PRIVATE)
+        val fout = this.applicationContext.openFileOutput("appData2.txt", Context.MODE_PRIVATE)
         TheSchedule.write(fout)
         fout.flush()
         fout.close()
