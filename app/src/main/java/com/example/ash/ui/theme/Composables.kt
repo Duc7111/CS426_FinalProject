@@ -240,7 +240,7 @@ fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) ->
 
 //@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun OptionButtons(modifier: Modifier = Modifier, onAddNewEvent: (Event) -> Unit) {
+fun OptionButtons(modifier: Modifier = Modifier, onAddNewEvent: (Event) -> Unit, onBubbleDisplay: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()

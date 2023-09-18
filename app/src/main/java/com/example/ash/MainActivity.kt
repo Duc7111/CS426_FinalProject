@@ -425,6 +425,9 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier, o
                 Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
                 Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
             }
+        },
+        onBubbleDisplay = {
+            onBubbleDisplay
         }
     )
 
