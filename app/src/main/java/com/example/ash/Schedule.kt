@@ -86,7 +86,7 @@ class Schedule private constructor(
 
         private fun read(file: File): Schedule
         {
-            if(!file.isFile) return Schedule()
+            if(!file.isFile) instance = Schedule()
             val fin = file.inputStream()
             val fbr = fin.bufferedReader()
             var size = DataHandler.readInt(fbr)
@@ -110,7 +110,8 @@ class Schedule private constructor(
             for(i in 0 until size) dailyEvents.addElement(Event.read(fbr))
 
             fin.close()
-            return Schedule(events, yearlyEvents, monthlyEvents, weeklyEvents, dailyEvents)
+            instance = Schedule(events, yearlyEvents, monthlyEvents, weeklyEvents, dailyEvents)
+            return instance as Schedule
         }
     }
 
