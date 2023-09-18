@@ -368,7 +368,6 @@ fun DisplayAttendee(attendees: Vector<Attendee>) {
                 .fillMaxWidth()
         ) {
             Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Text(
@@ -382,7 +381,7 @@ fun DisplayAttendee(attendees: Vector<Attendee>) {
                     ) {
                         attendees.forEach { attendee ->
                             Text(
-                                text = "${attendee.getName()}",
+                                text = "${attendee.getName()} - ${attendee.getRole()} - ${attendee.getContact()} " ,
                                 color = Color.Black,
                                 modifier = Modifier
                                     .padding(10.dp)
