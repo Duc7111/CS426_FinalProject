@@ -35,12 +35,9 @@ import com.example.ash.R
 
 
 @Composable
-fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, isNewEvent: Boolean, onClose: () -> Unit, onSave: (Event) -> Unit, onDelete: (Event) -> Unit) {
+fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, isNewEvent: Boolean, onClose: () -> Unit, onSave: (Event) -> Unit, onDelete: () -> Unit) {
 
-    var changedEvent by remember {
-        mutableStateOf(event)
-    }
-
+    var changedEvent by remember { mutableStateOf(event) }
     var isEditable by remember { mutableStateOf(false) }
     if (isNewEvent) isEditable = true
 
@@ -87,7 +84,7 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, is
                     }
                     else {
                         Text(
-                            text = "Editing event mode",
+                            text = "Editing mode",
                             fontSize = 20.sp
                         )
                     }
@@ -139,7 +136,7 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, is
                     Button( //Delete event button
                         onClick = {
                             // Handle deleting the event here
-                            onDelete(event)
+                            onDelete()
                             // Raise the confirm dialog
                             onClose()
                         }
@@ -169,20 +166,19 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, is
     )
 }
 
-@Preview
 @Composable
 fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) -> Unit, onDelete: (Event) -> Unit) {
     var showEventDialog by remember { mutableStateOf(false) }
     var changedEvent by remember { mutableStateOf(event) }
 
-//    var summary : String = "Dinner date"
-//    var location : String = "Haidilao"
-//    var date : String = "September 3rd, 2023"
-//    var startime : String = "7PM"
-//    var description : String = "Remember to buy a bouquet of flowers and bla bla bla" +
-//            "bla bla bla bla bla bla bla bla bla blabla bla bla bla blabla bla bla bla bla"
+    var summary : String = "Dinner date"
+    var location : String = "Haidilao"
+    var date : String = "September 3rd, 2023"
+    var startime : String = "7PM"
+    var description : String = "Remember to buy a bouquet of flowers and bla bla bla" +
+            "bla bla bla bla bla bla bla bla bla blabla bla bla bla blabla bla bla bla bla"
 
-//    var current_event = Event(summary = summary, location = location, description = description)
+    var current_event = Event(summary = summary, location = location, description = description)
 
 
     Button(
@@ -196,11 +192,11 @@ fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) ->
         shape = RoundedCornerShape(8.dp),
     ) {
         Text(
-            text = "${event.getSummary()}" + " - " +
-                    "${event.getLocation()}" + " - " +
-                    "${event.getDate()}" + " - " +
-                    "${event.getStartTime()}" + " - " +
-                    "${event.getDescription()}",
+            text = "${changedEvent.getSummary()}" + " - " +
+                    "${changedEvent.getLocation()}" + " - " +
+                    "${changedEvent.getDate()}" + " - " +
+                    "${changedEvent.getStartTime()}" + " - " +
+                    "${changedEvent.getDescription()}",
             color = TextWhite,
             maxLines = 1, // Set the maximum number of lines
             overflow = TextOverflow.Ellipsis // Truncate with ellipsis when text overflows)
@@ -222,8 +218,8 @@ fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) ->
                 showEventDialog = false
             },
             onSave = {
-                changedEvent = it
-                onSave(changedEvent)
+                current_event = it
+                onSave(current_event)
             },
             onDelete = {
                 onDelete(event)

@@ -32,13 +32,17 @@ import com.example.ash.ui.theme.Greeting
 import com.example.ash.ui.theme.MediumBlue
 import com.example.ash.ui.theme.OptionButtons
 import com.example.ash.ui.theme.TextWhite
+import java.io.File
+import java.util.Vector
 
 class MainActivity : ComponentActivity() {
 
-    val scheduleInstance = Schedule.getInstance()
+    var TheSchedule = Schedule.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        println("onCreate()")
+        testData(TheSchedule)
+        if (TheSchedule.getOnceEvents().size == 0) println("onCreate()")
         setContent {
             ASHTheme {
                 // A surface container using the 'background' color from the theme
@@ -46,7 +50,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Homescreen(schedule = scheduleInstance ,name = "Phoenix")
+                    Homescreen(schedule = TheSchedule ,name = "Phoenix")
 
                 }
             }
@@ -87,13 +91,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
 
+    var Schedule by remember { mutableStateOf(schedule) }
+    var OnceEvents by remember { mutableStateOf(Schedule.getOnceEvents())}
+    var DailyEvents by remember { mutableStateOf(Schedule.getDailyEvents())}
+    var WeeklyEvents by remember { mutableStateOf(Schedule.getWeeklyEvents())}
+    var MonthlyEvents by remember { mutableStateOf(Schedule.getMonthlyEvents())}
+    var YearlyEvents by remember { mutableStateOf(Schedule.getYearlyEvents())}
 
-    var OnceEvents by remember { mutableStateOf(schedule.getOnceEvents())}
-    var DailyEvents by remember { mutableStateOf(schedule.getDailyEvents())}
-    var WeeklyEvents by remember { mutableStateOf(schedule.getWeeklyEvents())}
-    var MonthlyEvents by remember { mutableStateOf(schedule.getMonthlyEvents())}
-    var YearlyEvents by remember { mutableStateOf(schedule.getYearlyEvents())}
-
+    var isVisibleTestRemoveEvent by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier
         .background(DeepBlue)
@@ -106,7 +111,7 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                 .padding(top = 10.dp) // Add padding to separate Greeting from LazyColumn
         ) {
             Greeting(name)
-            LazyColumn(modifier = modifier) {
+            LazyColumn(modifier = modifier.fillMaxSize()) {
                 item {
                     Text(
                         text = "One time events",
@@ -145,7 +150,12 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                                             //OnceEvents.set(index, updatedEvent)
                                         }
                                     },
-                                    onDelete = { schedule.removeEvent(it) }
+                                    onDelete = {
+                                        if(Schedule.removeEvent(it) == true) {
+                                            println("Delete once event sucessfully")
+                                            OnceEvents = Schedule.getOnceEvents()
+                                        }
+                                    }
                                 )
                             }
                             }
@@ -170,11 +180,20 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                                 color = MediumBlue,
                                 shape = RoundedCornerShape(16.dp)
                             ), // Set the background color
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.TopStart
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             items(DailyEvents) {DailyEvent ->
-                                EventButton(event = DailyEvent, modifier = modifier, onSave = {}, onDelete = {})
+                                EventButton(event = DailyEvent,
+                                    modifier = modifier,
+                                    onSave = {},
+                                    onDelete = {
+                                        if(Schedule.removeEvent(DailyEvent)) {
+                                            println("Delete daily event sucessfully")
+                                            DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                    }
+                                )
                             }
                         }
                     }
@@ -197,11 +216,20 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                                 color = MediumBlue,
                                 shape = RoundedCornerShape(16.dp)
                             ), // Set the background color
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.TopStart
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             items(WeeklyEvents) {WeeklyEvent ->
-                                EventButton(event = WeeklyEvent, modifier = modifier, onSave = {}, onDelete = {})
+                                EventButton(
+                                    event = WeeklyEvent,
+                                    modifier = modifier,
+                                    onSave = {},
+                                    onDelete = {
+                                        if(Schedule.removeEvent(WeeklyEvent)) {
+                                            println("Delete weekly event sucessfully")
+                                            WeeklyEvents = Schedule.getWeeklyEvents()
+                                        }
+                                    })
                             }
                         }
                     }
@@ -224,11 +252,20 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                                 color = MediumBlue,
                                 shape = RoundedCornerShape(16.dp)
                             ), // Set the background color
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.TopStart
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             items(MonthlyEvents) {MonthlyEvent ->
-                                EventButton(event = MonthlyEvent, modifier = modifier, onSave = {}, onDelete = {})
+                                EventButton(
+                                    event = MonthlyEvent,
+                                    modifier = modifier,
+                                    onSave = {},
+                                    onDelete = {
+                                        if(Schedule.removeEvent(MonthlyEvent)) {
+                                            println("Delete weekly event sucessfully")
+                                            MonthlyEvents = Schedule.getMonthlyEvents()
+                                        }
+                                    })
                             }
                         }
                     }
@@ -251,11 +288,20 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                                 color = MediumBlue,
                                 shape = RoundedCornerShape(16.dp)
                             ), // Set the background color
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.TopStart
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             items(YearlyEvents) {YearlyEvent ->
-                                EventButton(event = YearlyEvent, modifier = modifier, onSave = {}, onDelete = {})
+                                EventButton(
+                                    event = YearlyEvent,
+                                    modifier = modifier,
+                                    onSave = {},
+                                    onDelete = {
+                                        if(Schedule.removeEvent(YearlyEvent)) {
+                                            println("Delete weekly event sucessfully")
+                                            YearlyEvents = Schedule.getYearlyEvents()
+                                        }
+                                    })
                             }
                         }
                     }
@@ -265,7 +311,7 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.TopStart
                     ) {}
                 }
             }
@@ -273,6 +319,103 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
         }
     }
     OptionButtons()
+
+}
+
+fun testData(schedule: Schedule) {
+
+    val attendee1 = Attendee("John Doe", "Organizer", "john@example.com")
+    val attendee2 = Attendee("Alice Smith", "Participant", "alice@example.com")
+    val attendee3 = Attendee("Bob Johnson", "Participant", "bob@example.com")
+    val attendee4 = Attendee("Eve Williams", "Participant", "eve@example.com")
+    val attendee5 = Attendee("Charlie Brown", "Participant", "charlie@example.com")
+    val attendee6 = Attendee("Grace Davis", "Participant", "grace@example.com")
+
+    val attendees = Vector<Attendee>()
+    attendees.addAll(listOf(attendee1, attendee2, attendee3, attendee4, attendee5, attendee6))
+
+    var oncevent1 = Event(
+        frequency = Event.Frequency.ONCE,
+        summary = "Birthday party",
+        description = "Celebrate John's birthday",
+        location = "123 Main Street",
+        attendees = attendees
+        )
+    var oncevent2 = Event(
+        frequency = Event.Frequency.ONCE,
+        summary = "Birthday party",
+        description = "Celebrate John's birthday",
+        location = "123 Main Street",
+        attendees = attendees
+    )
+    var oncevent3 = Event(
+        frequency = Event.Frequency.ONCE,
+        summary = "Birthday party",
+        description = "Celebrate John's birthday",
+        location = "123 Main Street",
+        attendees = attendees
+    )
+    var oncevent4 = Event(
+        frequency = Event.Frequency.ONCE,
+        summary = "Birthday party",
+        description = "Celebrate John's birthday",
+        location = "123 Main Street",
+        attendees = attendees
+    )
+    var oncevent5 = Event(
+        frequency = Event.Frequency.ONCE,
+        summary = "Birthday party",
+        description = "Celebrate John's birthday",
+        location = "123 Main Street",
+        attendees = attendees
+    )
+    var oncevent6 = Event(
+        frequency = Event.Frequency.ONCE,
+        summary = "Birthday party",
+        description = "Celebrate John's birthday",
+        location = "123 Main Street",
+        attendees = attendees
+    )
+
+
+    var yearevent = Event(
+        frequency = Event.Frequency.YEARLY,
+        summary = "Anniversary",
+        description = "Celebrate 5th Anniversary",
+        location = "456 Elm Street",
+        attendees = attendees
+    )
+    var monthevent = Event(
+        frequency = Event.Frequency.WEEKLY,
+        summary = "Team Meeting",
+        description = "Discuss project updates",
+        location = "Conference Room A",
+        attendees = attendees
+    )
+    var weekevent = Event(
+        frequency = Event.Frequency.MONTHLY,
+        summary = "Gym Session",
+        description = "Stay fit",
+        location = "Fit Life Gym",
+        attendees = attendees
+    )
+    var dailyevent = Event(
+        frequency = Event.Frequency.DAILY,
+        summary = "Morning Jog",
+        description = "Stay healthy",
+        location = "Local Park",
+        attendees = attendees
+    )
+
+    schedule.addEvent(oncevent1)
+    schedule.addEvent(oncevent2)
+    schedule.addEvent(oncevent3)
+    schedule.addEvent(oncevent4)
+    schedule.addEvent(oncevent5)
+    schedule.addEvent(yearevent)
+    schedule.addEvent(monthevent)
+    schedule.addEvent(weekevent)
+    schedule.addEvent(dailyevent)
 
 }
 
