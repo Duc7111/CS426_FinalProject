@@ -3,6 +3,8 @@ package com.example.ash
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.widget.TimePicker
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -11,17 +13,24 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +40,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -46,14 +56,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.google.android.material.datepicker.MaterialDatePicker
 import org.jetbrains.annotations.Nullable
@@ -213,7 +226,7 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
             )
         }
         item {
-            DisplayAttendee(attendees = attendees)
+            DisplayAttendee(attendees = attendees, isEditable = isEditable)
             }
         }
 
@@ -370,7 +383,10 @@ fun TimePickCard(timePickerState: TimePickerState, onTimePick: (List<Int>) -> Un
 }
 
 @Composable
-fun DisplayAttendee(attendees: Vector<Attendee>) {
+fun DisplayAttendee(attendees: Vector<Attendee>, isEditable: Boolean = false) {
+
+    var showAddDialog by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -383,11 +399,28 @@ fun DisplayAttendee(attendees: Vector<Attendee>) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                Text(
-                    text = "Attendees",
-                    color = Color.Gray,
-                    modifier = Modifier.padding(10.dp)
-                )
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Attendees",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                    Button(
+                        onClick = {
+                            showAddDialog = true
+                        },
+                        enabled = isEditable,
+                        modifier = Modifier
+                            .padding(vertical = 5.dp, horizontal = 10.dp)
+                            .height(30.dp)
+                    ) {
+                        Text ("Add attendee", fontSize = 10.sp)
+                    }
+                }
+
                 if (attendees.size != 0) {
                     Column(
                         modifier = Modifier.verticalScroll(rememberScrollState())
@@ -417,7 +450,90 @@ fun DisplayAttendee(attendees: Vector<Attendee>) {
             }
         }
     }
+
+    if (showAddDialog) {
+        AddAttendeeDialog(
+            onAddNewAttendee = {attendees.addElement(it)},
+            onClose = {
+                showAddDialog = false
+            }
+        )
+    }
 }
+
+
+
+@Composable
+fun AddAttendeeDialog(onAddNewAttendee: (Attendee) -> Unit, onClose: () -> Unit) {
+
+    var newAttendee by remember { mutableStateOf(Attendee()) }
+    var newName by remember { mutableStateOf("") }
+    var newRole by remember { mutableStateOf("") }
+    var newContact by remember { mutableStateOf("") }
+
+    AlertDialog(
+        modifier = Modifier,
+        onDismissRequest = {
+        },
+        title = { Text ( text = "New Attendee" ) },
+        text = {
+                Column (
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
+                        ) {
+                    OutlinedTextField(
+                        value = newName,
+                        onValueChange = { newName = it },
+                        label = { Text(text = "Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = newRole,
+                        onValueChange = { newRole = it },
+                        label = { Text(text = "Role") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = newContact,
+                        onValueChange = { newContact = it },
+                        label = { Text(text = "Contact info") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+        },
+        dismissButton = {
+            Row() {
+                    Button( //Cancel
+                        onClick = {
+                            onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button( //Save
+                        onClick = {
+                            onAddNewAttendee(Attendee(newName,newRole,newContact))
+                            onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Text("Save")
+                    }
+                }
+
+
+        },
+        confirmButton = {
+
+        }
+
+    )
+
+}
+
 
 @Preview
 @Composable
