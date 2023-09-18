@@ -98,7 +98,6 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
     var MonthlyEvents by remember { mutableStateOf(Schedule.getMonthlyEvents())}
     var YearlyEvents by remember { mutableStateOf(Schedule.getYearlyEvents())}
 
-    var isVisibleTestRemoveEvent by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier
         .background(DeepBlue)
@@ -139,15 +138,21 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                                 EventButton(
                                     event = mutableOnceEvent,
                                     modifier = modifier,
-                                    onSave = { updatedEvent ->
-                                        // Update the mutable variable with the changes
-                                        mutableOnceEvent = updatedEvent
-                                        //save the updated event to the original list
-                                        var index = OnceEvents.indexOf(onceEvent)
-
-                                        // If the index is valid (not -1), update the original list
-                                        if (index != -1) {
-                                            //OnceEvents.set(index, updatedEvent)
+                                    onSave = {
+                                        Schedule.modifyEvent(onceEvent, it)
+                                        when (onceEvent.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                        when (it.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
                                         }
                                     },
                                     onDelete = {
@@ -184,9 +189,27 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             items(DailyEvents) {DailyEvent ->
-                                EventButton(event = DailyEvent,
+                                var mutableDailyEvent by remember { mutableStateOf(DailyEvent) }
+
+                                EventButton(event = mutableDailyEvent,
                                     modifier = modifier,
-                                    onSave = {},
+                                    onSave = {
+                                        Schedule.modifyEvent(DailyEvent, it)
+                                        when (DailyEvent.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                        when (it.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                    },
                                     onDelete = {
                                         if(Schedule.removeEvent(DailyEvent)) {
                                             println("Delete daily event sucessfully")
@@ -220,10 +243,27 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             items(WeeklyEvents) {WeeklyEvent ->
+                                var mutableWeeklyEvent by remember { mutableStateOf(WeeklyEvent) }
                                 EventButton(
-                                    event = WeeklyEvent,
+                                    event = mutableWeeklyEvent,
                                     modifier = modifier,
-                                    onSave = {},
+                                    onSave = {
+                                        Schedule.modifyEvent(WeeklyEvent, it)
+                                        when (WeeklyEvent.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                        when (it.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                    },
                                     onDelete = {
                                         if(Schedule.removeEvent(WeeklyEvent)) {
                                             println("Delete weekly event sucessfully")
@@ -256,10 +296,27 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             items(MonthlyEvents) {MonthlyEvent ->
+                                var mutableMonthlyEvent by remember { mutableStateOf(MonthlyEvent) }
                                 EventButton(
-                                    event = MonthlyEvent,
+                                    event = mutableMonthlyEvent,
                                     modifier = modifier,
-                                    onSave = {},
+                                    onSave = {
+                                        Schedule.modifyEvent(MonthlyEvent, it)
+                                        when (MonthlyEvent.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                        when (it.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                    },
                                     onDelete = {
                                         if(Schedule.removeEvent(MonthlyEvent)) {
                                             println("Delete weekly event sucessfully")
@@ -292,10 +349,27 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
                     ) {
                         LazyColumn(modifier = modifier.padding(vertical = 5.dp)) {
                             items(YearlyEvents) {YearlyEvent ->
+                                var mutableYearlyEvent by remember { mutableStateOf(YearlyEvent) }
                                 EventButton(
-                                    event = YearlyEvent,
+                                    event = mutableYearlyEvent,
                                     modifier = modifier,
-                                    onSave = {},
+                                    onSave = {
+                                        Schedule.modifyEvent(YearlyEvent, it)
+                                        when (YearlyEvent.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                        when (it.getFrequency()) {
+                                            Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                                            Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                                            Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                                            Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                                            Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+                                        }
+                                    },
                                     onDelete = {
                                         if(Schedule.removeEvent(YearlyEvent)) {
                                             println("Delete weekly event sucessfully")
@@ -318,7 +392,18 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier) {
 
         }
     }
-    OptionButtons()
+    OptionButtons(
+        onAddNewEvent = {
+            Schedule.addEvent(it)
+            when (it.getFrequency()) {
+                Event.Frequency.ONCE -> OnceEvents = Schedule.getOnceEvents()
+                Event.Frequency.YEARLY -> YearlyEvents = Schedule.getYearlyEvents()
+                Event.Frequency.MONTHLY -> MonthlyEvents = Schedule.getMonthlyEvents()
+                Event.Frequency.WEEKLY -> WeeklyEvents = Schedule.getWeeklyEvents()
+                Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
+            }
+        }
+    )
 
 }
 
@@ -336,42 +421,42 @@ fun testData(schedule: Schedule) {
 
     var oncevent1 = Event(
         frequency = Event.Frequency.ONCE,
-        summary = "Birthday party",
+        summary = "Birthday party 1",
         description = "Celebrate John's birthday",
         location = "123 Main Street",
         attendees = attendees
         )
     var oncevent2 = Event(
         frequency = Event.Frequency.ONCE,
-        summary = "Birthday party",
+        summary = "Birthday party 2",
         description = "Celebrate John's birthday",
         location = "123 Main Street",
         attendees = attendees
     )
     var oncevent3 = Event(
         frequency = Event.Frequency.ONCE,
-        summary = "Birthday party",
+        summary = "Birthday party 3",
         description = "Celebrate John's birthday",
         location = "123 Main Street",
         attendees = attendees
     )
     var oncevent4 = Event(
         frequency = Event.Frequency.ONCE,
-        summary = "Birthday party",
+        summary = "Birthday party 4",
         description = "Celebrate John's birthday",
         location = "123 Main Street",
         attendees = attendees
     )
     var oncevent5 = Event(
         frequency = Event.Frequency.ONCE,
-        summary = "Birthday party",
+        summary = "Birthday party 5",
         description = "Celebrate John's birthday",
         location = "123 Main Street",
         attendees = attendees
     )
     var oncevent6 = Event(
         frequency = Event.Frequency.ONCE,
-        summary = "Birthday party",
+        summary = "Birthday party 6",
         description = "Celebrate John's birthday",
         location = "123 Main Street",
         attendees = attendees
@@ -412,12 +497,14 @@ fun testData(schedule: Schedule) {
     schedule.addEvent(oncevent3)
     schedule.addEvent(oncevent4)
     schedule.addEvent(oncevent5)
+    schedule.addEvent(oncevent6)
     schedule.addEvent(yearevent)
     schedule.addEvent(monthevent)
     schedule.addEvent(weekevent)
     schedule.addEvent(dailyevent)
 
 }
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

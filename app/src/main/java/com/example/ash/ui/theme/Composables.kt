@@ -32,6 +32,10 @@ import androidx.compose.ui.unit.sp
 import com.example.ash.Event
 import com.example.ash.EventDisplay
 import com.example.ash.R
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 
 @Composable
@@ -131,7 +135,10 @@ fun EventDetailsDialog(modifier: Modifier, event: Event, isViewOnly: Boolean, is
         confirmButton = {
             // The close button when viewing the event
             if (!isEditable && !isNewEvent)
-                Row() {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                 // Delete and Close button
                     Button( //Delete event button
                         onClick = {
@@ -180,6 +187,9 @@ fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) ->
 
     var current_event = Event(summary = summary, location = location, description = description)
 
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT+07")) // Set your desired timezone
+
 
     Button(
         onClick = {
@@ -194,8 +204,8 @@ fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) ->
         Text(
             text = "${changedEvent.getSummary()}" + " - " +
                     "${changedEvent.getLocation()}" + " - " +
-                    "${changedEvent.getDate()}" + " - " +
-                    "${changedEvent.getStartTime()}" + " - " +
+                    //"${changedEvent.}" + " - " +
+                    "${sdf.format(changedEvent.getStartTime().getTime())}" + " - " +
                     "${changedEvent.getDescription()}",
             color = TextWhite,
             maxLines = 1, // Set the maximum number of lines
@@ -231,7 +241,7 @@ fun EventButton(event: Event , modifier: Modifier = Modifier, onSave: (Event) ->
 //@RequiresApi(Build.VERSION_CODES.Q)
 @Preview
 @Composable
-fun OptionButtons(modifier: Modifier = Modifier) {
+fun OptionButtons(modifier: Modifier = Modifier, onAddNewEvent: (Event) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -300,16 +310,17 @@ fun OptionButtons(modifier: Modifier = Modifier) {
             //bubbleDisplay()
         }
         if (showEventDialog) {
-            var newEvent = Event()
             EventDetailsDialog(
                 modifier = modifier,
-                event = newEvent,
+                event = Event(),
                 isViewOnly = false,
                 isNewEvent = true,
                 onClose = {
                         showEventDialog = false
                 },
-                onSave = {},
+                onSave = {
+                         onAddNewEvent(it)
+                },
                 onDelete = {}
             )
 

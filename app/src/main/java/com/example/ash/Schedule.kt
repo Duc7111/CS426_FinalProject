@@ -156,14 +156,38 @@ class Schedule private constructor(
 
     fun modifyEvent(event: Event, modifiedEvent: Event): Event?
     {
-        if(!removeEvent(event)) return null
-        val temp = addEvent(modifiedEvent)
-        if(temp != null)
-        {
-            addEvent(event)
-            return temp
+        if (event.getFrequency() != modifiedEvent.getFrequency()) {
+            if (!removeEvent(event)) {
+                return null
+                println("Remove event fail")
+            }
+            val temp = addEvent(modifiedEvent)
+            if (temp != null) {
+                addEvent(event)
+                return temp
+            }
+            return null
         }
-        return null
+        else {
+            // Find the index of the event to be modified in the appropriate vector
+            val eventVector = when (event.getFrequency()) {
+                Event.Frequency.ONCE -> events
+                Event.Frequency.YEARLY -> yearlyEvents
+                Event.Frequency.MONTHLY -> monthlyEvents
+                Event.Frequency.WEEKLY -> weeklyEvents
+                Event.Frequency.DAILY -> dailyEvents
+            }
+
+            val index = eventVector.indexOf(event)
+
+            // If the event is found, replace it with the modified event
+            if (index != -1) {
+                eventVector[index] = modifiedEvent
+                return modifiedEvent // Event modified successfully
+            }
+
+            return null // Event not found, modification failed
+        }
     }
 
     fun getOnceEvents() = events.toList()

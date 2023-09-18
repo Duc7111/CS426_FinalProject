@@ -62,6 +62,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.util.Calendar.HOUR
 import java.util.Vector
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +74,7 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
     var description by remember { mutableStateOf(event.getDescription()) }
     var location by remember { mutableStateOf(event.getLocation()) }
     var date by remember { mutableStateOf(event.getStartTime()) }
+    var endate by remember { mutableStateOf(event.getStartTime()) }
     var startTime by remember { mutableStateOf(event.getTime(true)) }
     var endTime by remember { mutableStateOf(event.getTime(false)) }
     val attendees: Vector<Attendee> by remember { mutableStateOf(Vector(event.getAttendees())) }
@@ -188,15 +190,24 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
             )
         }
         item {
+
             TimeDisplay(
                 time = startTime,
-                onTimePick = { startTime = it },
+                onTimePick = {
+                    startTime = it
+                    date.set(Calendar.HOUR_OF_DAY, startTime[0])
+                    date.set(Calendar.MINUTE, startTime[1])
+                },
                 label = "From",
                 isEditable = isEditable
             )
             TimeDisplay(
                 time = endTime,
-                onTimePick = { endTime = it },
+                onTimePick = {
+                    endTime = it
+                    endate.set(Calendar.HOUR_OF_DAY, endTime[0])
+                    endate.set(Calendar.MINUTE, endTime[1])
+                },
                 label = "To",
                 isEditable = isEditable
             )
@@ -206,7 +217,8 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
             }
         }
 
-    onEventChange(Event(frequency = frequency, summary = summary, description = description, location = location, startTime = date, attendees = attendees))
+
+    onEventChange(Event(frequency = frequency, summary = summary, description = description, location = location, startTime = date, endTime = endate, attendees = attendees))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -298,8 +310,8 @@ fun TimeDisplay(time: List<Int>, onTimePick: (List<Int>) -> Unit, label: String,
     val hour = initTime[0]
     val minute = initTime[1]
     val timerSelectedStore = remember { mutableStateOf("${initTime[0]}:${initTime[1]}") }
-    var hourSelect: Int = initTime[0]
-    var minuteSelect: Int = initTime[1]
+    var hourSelect: Int by remember { mutableStateOf(initTime[0]) }
+    var minuteSelect: Int by remember { mutableStateOf(initTime[1]) }
 
     val mTimePickerDialog = TimePickerDialog(
         context,
@@ -329,6 +341,7 @@ fun TimeDisplay(time: List<Int>, onTimePick: (List<Int>) -> Unit, label: String,
     }
 
     onTimePick(listOf(hourSelect, minuteSelect))
+    println("$hourSelect:$minuteSelect")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
