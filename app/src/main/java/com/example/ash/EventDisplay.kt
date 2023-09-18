@@ -87,7 +87,6 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
     var description by remember { mutableStateOf(event.getDescription()) }
     var location by remember { mutableStateOf(event.getLocation()) }
     var date by remember { mutableStateOf(event.getStartTime()) }
-    var endate by remember { mutableStateOf(event.getStartTime()) }
     var startTime by remember { mutableStateOf(event.getTime(true)) }
     var endTime by remember { mutableStateOf(event.getTime(false)) }
     val attendees: Vector<Attendee> by remember { mutableStateOf(Vector(event.getAttendees())) }
@@ -218,8 +217,6 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
                 time = endTime,
                 onTimePick = {
                     endTime = it
-                    endate.set(Calendar.HOUR_OF_DAY, endTime[0])
-                    endate.set(Calendar.MINUTE, endTime[1])
                 },
                 label = "To",
                 isEditable = isEditable
@@ -229,9 +226,13 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
             DisplayAttendee(attendees = attendees, isEditable = isEditable)
             }
         }
-
-
-    onEventChange(Event(frequency = frequency, summary = summary, description = description, location = location, startTime = date, endTime = endate, attendees = attendees))
+    var endtime: Calendar? = null
+    if(!endTime.isEmpty())
+    {
+        endtime = Calendar.getInstance()
+        endtime.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE), endTime[0], endTime[1])
+    }
+    onEventChange(Event(frequency = frequency, summary = summary, description = description, location = location, startTime = date, endTime = endtime, attendees = attendees))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
