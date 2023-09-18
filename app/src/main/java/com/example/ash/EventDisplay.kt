@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -449,92 +450,89 @@ fun DisplayAttendee(attendees: Vector<Attendee>, isEditable: Boolean = false) {
             }
         }
     }
+
+    if (showAddDialog) {
+        AddAttendeeDialog(
+            onAddNewAttendee = {attendees.addElement(it)},
+            onClose = {
+                showAddDialog = false
+            }
+        )
+    }
 }
 
 
-//
-//@Composable
-//fun AddAttendeeDialog(onAddNewAttendee: () -> Unit) {
-//    AlertDialog(
-//        modifier = Modifier,
-//        onDismissRequest = {
-//        },
-//        title = { Text ( text = "New Attendee" ) },
-//        text = {
-//
-//        },
-//        dismissButton = {
-//            Row() {
-//                //Cancel and Ok buttons when edit/add an event
-//                if (isEditable) {
-//                    Button( //Cancel
-//                        onClick = {
-//                            isEditable = false
-//                            if (isNewEvent) {
-//                                // Close without handling the data
-//                                onClose()
-//                            }
-//                        },
-//                        modifier = Modifier.padding(horizontal = 20.dp)
-//                    ) {
-//                        Text("Cancel")
-//                    }
-//                    Button( //Save
-//                        onClick = {
-//                            onSave(changedEvent)
-//                            //if (isNewEvent) onClose()
-//                            isEditable = false
-//                        },
-//                        modifier = Modifier.padding(horizontal = 5.dp)
-//                    ) {
-//                        Text("Save")
-//                    }
-//                }
-//            }
-//
-//        },
-//        confirmButton = {
-//            // The close button when viewing the event
-//            if (!isEditable && !isNewEvent)
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    // Delete and Close button
-//                    Button( //Delete event button
-//                        onClick = {
-//                            // Handle deleting the event here
-//                            onDelete()
-//                            // Raise the confirm dialog
-//                            onClose()
-//                        }
-//                    ) {
-//                        Row() {
-//                            Image(
-//                                painter = painterResource(id = R.drawable.trash_icon), // Replace with your image resource
-//                                contentDescription = null, // Provide a suitable content description
-//                                modifier = Modifier.size(24.dp) // Adjust the size as needed
-//                            )
-//                            Text(
-//                                text = "Delete this event"
-//                            )
-//                        }
-//                    }
-//                    Button( //Close dialog button
-//                        onClick = {
-//                            isEditable = false
-//                            onClose()
-//                        }
-//                    ) {
-//                        Text("Close")
-//                    }
-//                }
-//
-//        }
-//
-//    )
-//
-//}
+
+@Composable
+fun AddAttendeeDialog(onAddNewAttendee: (Attendee) -> Unit, onClose: () -> Unit) {
+
+    var newAttendee by remember { mutableStateOf(Attendee()) }
+    var newName by remember { mutableStateOf("") }
+    var newRole by remember { mutableStateOf("") }
+    var newContact by remember { mutableStateOf("") }
+
+    AlertDialog(
+        modifier = Modifier,
+        onDismissRequest = {
+        },
+        title = { Text ( text = "New Attendee" ) },
+        text = {
+                Column (
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
+                        ) {
+                    OutlinedTextField(
+                        value = newName,
+                        onValueChange = { newName = it },
+                        label = { Text(text = "Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = newRole,
+                        onValueChange = { newRole = it },
+                        label = { Text(text = "Role") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = newContact,
+                        onValueChange = { newContact = it },
+                        label = { Text(text = "Contact info") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+        },
+        dismissButton = {
+            Row() {
+                    Button( //Cancel
+                        onClick = {
+                            onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 20.dp)
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button( //Save
+                        onClick = {
+                            onAddNewAttendee(Attendee(newName,newRole,newContact))
+                            onClose()
+                        },
+                        modifier = Modifier.padding(horizontal = 5.dp)
+                    ) {
+                        Text("Save")
+                    }
+                }
+
+
+        },
+        confirmButton = {
+
+        }
+
+    )
+
+}
 
 
 @Preview
