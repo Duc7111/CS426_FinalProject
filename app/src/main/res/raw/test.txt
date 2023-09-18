@@ -1,0 +1,64 @@
+2
+ONCE
+Birthday Party
+Celebrate John's birthday
+123 Main Street
+2023-09-15T08:00
+NA
+2
+John Smith
+john@example.com
+Jane Doe
+jane@example.com
+
+YEARLY
+Anniversary
+Celebrate 5th Anniversary
+456 Elm Street
+2023-10-20T10:30
+NA
+2
+Alice Johnson
+alice@example.com
+Bob Brown
+bob@example.com
+
+MONTHLY
+Team Meeting
+Discuss project updates
+Conference Room A
+2023-09-15T14:00
+NA
+3
+David Davis
+david@example.com
+Emily Evans
+emily@example.com
+Grace Green
+grace@example.com
+
+WEEKLY
+Gym Session
+Stay fit
+Fit Life Gym
+2023-09-20T16:30
+NA
+1
+Henry Harris
+henry@example.com
+
+DAILY
+Morning Jog
+Stay healthy
+Local Park
+2023-09-22T09:45
+NA
+3
+Linda Lee
+linda@example.com
+Michael Miller
+michael@example.com
+Olivia Oliver
+olivia@example.com
+
+
