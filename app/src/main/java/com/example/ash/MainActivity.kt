@@ -72,6 +72,8 @@ class MainActivity : ComponentActivity() {
             Schedule.getInstance(null)
         }
 
+        //testData(TheSchedule)
+
         bubbleViewModel = ViewModelProvider(this)[BubbleViewModel::class.java]
 
         if (TheSchedule.getOnceEvents().isEmpty()) println("onCreate()")
@@ -108,6 +110,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         val fout = this.applicationContext.openFileOutput("appData2.txt", Context.MODE_PRIVATE)
+        println("onStop()")
         TheSchedule.write(fout)
         fout.flush()
         fout.close()

@@ -90,7 +90,7 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
     var date by remember { mutableStateOf(event.getStartTime()) }
     var startTime by remember { mutableStateOf(event.getTime(true)) }
     var endTime by remember { mutableStateOf(event.getTime(false)) }
-    val attendees: Vector<Attendee> by remember { mutableStateOf(Vector(event.getAttendees())) }
+    var attendees: Vector<Attendee> by remember { mutableStateOf(Vector(event.getAttendees())) }
 
     var freqExpanded by remember { mutableStateOf(false) }
     var freqSize by remember { mutableStateOf(Size.Zero) }
@@ -224,7 +224,13 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
             )
         }
         item {
-            DisplayAttendee(attendees = attendees, isEditable = isEditable)
+            DisplayAttendee(
+                attendees = attendees,
+                isEditable = isEditable,
+                onAddNewAttendee = {
+                    attendees = it
+                }
+            )
             }
         }
     val endtime: Calendar by remember { mutableStateOf(Calendar.getInstance())}
@@ -384,7 +390,7 @@ fun TimePickCard(timePickerState: TimePickerState, onTimePick: (List<Int>) -> Un
 }
 
 @Composable
-fun DisplayAttendee(attendees: Vector<Attendee>, isEditable: Boolean = false) {
+fun DisplayAttendee(attendees: Vector<Attendee>, isEditable: Boolean = false, onAddNewAttendee: (Vector<Attendee>) -> Unit) {
 
     var showAddDialog by remember { mutableStateOf(false) }
 
@@ -418,7 +424,7 @@ fun DisplayAttendee(attendees: Vector<Attendee>, isEditable: Boolean = false) {
                             .padding(vertical = 5.dp, horizontal = 10.dp)
                             .height(30.dp)
                     ) {
-                        Text ("Add attendee", fontSize = 10.sp)
+                        Text ("Add attendee", fontSize = 13.sp)
                     }
                 }
 
@@ -454,7 +460,9 @@ fun DisplayAttendee(attendees: Vector<Attendee>, isEditable: Boolean = false) {
 
     if (showAddDialog) {
         AddAttendeeDialog(
-            onAddNewAttendee = {attendees.addElement(it)},
+            onAddNewAttendee = {
+                attendees.addElement(it)
+                onAddNewAttendee(attendees)},
             onClose = {
                 showAddDialog = false
             }
