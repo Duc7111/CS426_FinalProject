@@ -76,6 +76,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.Calendar.HOUR
+import java.util.Calendar.getInstance
 import java.util.Vector
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -226,13 +227,12 @@ fun EventDisplay(event: Event = Event(), isEditable: Boolean = false, onEventCha
             DisplayAttendee(attendees = attendees, isEditable = isEditable)
             }
         }
-    var endtime: Calendar? = null
+    val endtime: Calendar by remember { mutableStateOf(Calendar.getInstance())}
     if(!endTime.isEmpty())
     {
-        endtime = Calendar.getInstance()
         endtime.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE), endTime[0], endTime[1])
     }
-    onEventChange(Event(frequency = frequency, summary = summary, description = description, location = location, startTime = date, endTime = endtime, attendees = attendees))
+    onEventChange(Event(frequency = frequency, summary = summary, description = description, location = location, startTime = date, endTime = if(endTime.isEmpty()) null else endtime, attendees = attendees))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
