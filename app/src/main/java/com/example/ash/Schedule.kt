@@ -76,18 +76,10 @@ class Schedule private constructor(
 
     companion object{
 
-        @Volatile
-        private var instance: Schedule? = null
+        fun getInstance(fin: FileInputStream? = null) = if(fin == null) Schedule() else read(fin)
 
-        fun getInstance(file: File? = null) =
-            instance ?: synchronized(this){
-                instance ?: (if(file == null || !file.isFile) Schedule() else read(file)).also{instance = it}
-            }
-
-        private fun read(file: File): Schedule
+        private fun read(fin: FileInputStream): Schedule
         {
-            if(!file.isFile) instance = Schedule()
-            val fin = file.inputStream()
             val fbr = fin.bufferedReader()
             var size = DataHandler.readInt(fbr)
             val events = Vector<Event>(size)
@@ -110,8 +102,7 @@ class Schedule private constructor(
             for(i in 0 until size) dailyEvents.addElement(Event.read(fbr))
 
             fin.close()
-            instance = Schedule(events, yearlyEvents, monthlyEvents, weeklyEvents, dailyEvents)
-            return instance as Schedule
+            return Schedule(events, yearlyEvents, monthlyEvents, weeklyEvents, dailyEvents)
         }
     }
 

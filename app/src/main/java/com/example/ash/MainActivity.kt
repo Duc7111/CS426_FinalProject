@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import android.app.Person
+import android.content.Context
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
@@ -60,9 +61,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val fin = this.applicationContext.openFileInput("appData.txt")
+        TheSchedule = if(fin.read() == -1)
+            Schedule.getInstance(null)
+        else {
+            fin.skip(-1)
+            Schedule.getInstance(fin)
+        }
+        fin.close()
+
         bubbleViewModel = ViewModelProvider(this)[BubbleViewModel::class.java]
 
-        testData(TheSchedule)
         if (TheSchedule.getOnceEvents().isEmpty()) println("onCreate()")
         setContent {
             ASHTheme {
@@ -96,13 +105,15 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
+        val fout = this.applicationContext.openFileOutput("appData.txt", Context.MODE_PRIVATE)
+        TheSchedule.write(fout)
+        fout.flush()
+        fout.close()
         super.onStop()
-        println("onStop()")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        println("onDestroy()")
     }
 
     override fun onRestart() {
@@ -426,9 +437,7 @@ fun Homescreen(schedule: Schedule,name: String, modifier: Modifier = Modifier, o
                 Event.Frequency.DAILY -> DailyEvents = Schedule.getDailyEvents()
             }
         },
-        onBubbleDisplay = {
-            onBubbleDisplay
-        }
+        onBubbleDisplay = onBubbleDisplay
     )
 
 }
